@@ -1,0 +1,18 @@
+# Ignore Node.js generated files
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Ignore built application files
+/dist/
+/out/
+
+# Ignore OS-specific files
+.DS_Store
+Thumbs.db
+
+# Ignore any local development configuration files
+/config/local.json
+
+# Ignore logs
+*.log
