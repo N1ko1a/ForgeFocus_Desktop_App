@@ -38,6 +38,9 @@ router.patch('/:id', getTodo, async (req, res) => {
   if (req.body.Content != null) {
     res.todo.Content = req.body.Content
   }
+  if (req.body.Compleated != null) {
+    res.todo.Compleated = req.body.Compleated
+  }
   try {
     const updateTodo = await res.todo.save()
     res.json(updateTodo)
