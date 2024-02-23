@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react'
-import { AiFillDelete, AiOutlineCheck } from 'react-icons/ai'
+import { AiFillDelete, AiOutlineCheck, AiFillEdit } from 'react-icons/ai'
 
 function ToDo(): JSX.Element {
   const [tasks, setTasks] = useState([])
   const [inputTask, setInputTask] = useState('')
   const [checkedBox, setCheckedBox] = useState(false)
-  const [reload, setReload] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
+  const [editableId, setEditableId] = useState(null)
+  const [editableValue, setEditablelValue] = useState('')
 
   useEffect(() => {
     setIsLoading(true)
@@ -26,6 +27,9 @@ function ToDo(): JSX.Element {
 
   const handleInputTask = (event) => {
     setInputTask(event.target.value)
+  }
+  const handleInputTaskUpdate = (event) => {
+    setEditablelValue(event.target.value)
   }
   const handleCheckBoxChange = (e) => {
     setCheckedBox(e.target.checked)
@@ -54,7 +58,30 @@ function ToDo(): JSX.Element {
       }
     }
   }
-  const handleDelte = async (index) => {
+  const handleKeyDownUpdate = async (event, taskId) => {
+    if (event.key === 'Enter') {
+      try {
+        const response = await fetch(`http://localhost:3000/todo/${taskId}`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            Content: editableValue
+          })
+        })
+        const data = await response.json()
+
+        if (response.ok) {
+          setEditableId(null)
+          console.log(data.message)
+        }
+      } catch (error) {
+        console.error('An unexpected error occurred', error)
+      }
+    }
+  }
+  const handleDelete = async (index) => {
     try {
       const response = await fetch(`http://localhost:3000/todo/${index}`, {
         method: 'DELETE',
@@ -73,6 +100,12 @@ function ToDo(): JSX.Element {
     }
   }
 
+  const handleUpdate = (index) => {
+    setEditableId(index)
+    if (inputRef.current) {
+      inputRef.current.focus()
+    }
+  }
   return (
     <div className="bg-black/40 w-1/4 h-2/3 rounded-2xl backdrop-blur-sm flex flex-col justify-between items-center">
       <div className="flex w-11/12 h-10 bg-gray/30  backdrop-blur-sm hover:bg-black/25  transition duration-500 ease-in-out rounded-lg mt-5">
@@ -102,11 +135,28 @@ function ToDo(): JSX.Element {
                   className={`h-5 w-5 text-gray-200 hover:text-gray-600 transition duration-500 ease-in-out absolute left-0 top-1 ${checkedBox ? 'text-opacity-100' : 'text-opacity-0'}`}
                 />
               </label>
-              <h1 className="text-gray-200">{task.Content}</h1>
+              {editableId == task._id ? (
+                <input
+                  type="text"
+                  placeholder={task.Content}
+                  value={editableValue}
+                  onChange={handleInputTaskUpdate}
+                  onKeyDown={(event) => handleKeyDownUpdate(event, task._id)} // Pass event and task id
+                  onBlur={() => setEditableId(null)}
+                  className="w-full h-full bg-transparent rounded-lg text-white pl-4 outline-none"
+                />
+              ) : (
+                <h1 className="text-gray-200">{task.Content}</h1>
+              )}
             </div>
-            <button onClick={() => handleDelte(task._id)}>
-              <AiFillDelete className="flex justify-center items-center hover:text-gray-700 transition duration-500 ease-in-out" />
-            </button>
+            <div className="flex  w-fit h-full">
+              <button onClick={() => handleUpdate(task._id)}>
+                <AiFillEdit className="flex justify-center items-center mr-2 hover:text-gray-700 transition duration-500 ease-in-out" />
+              </button>
+              <button onClick={() => handleDelete(task._id)}>
+                <AiFillDelete className="flex justify-center items-center hover:text-gray-700 transition duration-500 ease-in-out" />
+              </button>
+            </div>
           </div>
         ))}
       </div>
