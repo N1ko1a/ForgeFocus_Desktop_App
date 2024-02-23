@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { AiFillDelete, AiOutlineCheck, AiFillEdit } from 'react-icons/ai'
 
 function ToDo(): JSX.Element {
@@ -8,6 +8,7 @@ function ToDo(): JSX.Element {
   const [isLoading, setIsLoading] = useState(true)
   const [editableId, setEditableId] = useState(null)
   const [editableValue, setEditablelValue] = useState('')
+  const ref = useRef(null)
 
   useEffect(() => {
     setIsLoading(true)
@@ -23,7 +24,11 @@ function ToDo(): JSX.Element {
         console.log('Error: Ne mogu da uzmem podatke', error)
         setIsLoading(false)
       })
-  }, [tasks])
+    if (editableId === null) return // No need to focus if editableId is null
+    if (ref.current) {
+      ref.current.focus()
+    }
+  }, [tasks, editableId])
 
   const handleInputTask = (event) => {
     setInputTask(event.target.value)
@@ -100,11 +105,9 @@ function ToDo(): JSX.Element {
     }
   }
 
-  const handleUpdate = (index) => {
-    setEditableId(index)
-    if (inputRef.current) {
-      inputRef.current.focus()
-    }
+  const handleUpdate = (task) => {
+    setEditableId(task._id)
+    setEditablelValue(task.Content)
   }
   return (
     <div className="bg-black/40 w-1/4 h-2/3 rounded-2xl backdrop-blur-sm flex flex-col justify-between items-center">
@@ -137,6 +140,7 @@ function ToDo(): JSX.Element {
               </label>
               {editableId == task._id ? (
                 <input
+                  ref={ref}
                   type="text"
                   placeholder={task.Content}
                   value={editableValue}
@@ -150,7 +154,7 @@ function ToDo(): JSX.Element {
               )}
             </div>
             <div className="flex  w-fit h-full">
-              <button onClick={() => handleUpdate(task._id)}>
+              <button onClick={() => handleUpdate(task)}>
                 <AiFillEdit className="flex justify-center items-center mr-2 hover:text-gray-700 transition duration-500 ease-in-out" />
               </button>
               <button onClick={() => handleDelete(task._id)}>
