@@ -9,7 +9,10 @@ function ToDo(): JSX.Element {
   const [editableId, setEditableId] = useState(null)
   const [editableValue, setEditablelValue] = useState('')
   const [complited, setComplited] = useState(false)
+  const [change, setChange] = useState(false)
+  const [test, setTest] = useState(false)
   const ref = useRef(null)
+  console.log(complited)
 
   useEffect(() => {
     setIsLoading(true)
@@ -18,18 +21,34 @@ function ToDo(): JSX.Element {
       .then((res) => res.json())
       .then((data) => {
         const todoResult = data || []
+        let count = 0
+        todoResult.map((task) => {
+          if (task.Compleated === true) {
+            console.log(task._id + ': ' + task.Compleated)
+            count += 1
+          }
+        })
+        console.log('Ovo: ', count)
+        if (count > 0) {
+          setComplited(true)
+        } else {
+          setComplited(false)
+        }
+
         setTasks(todoResult)
+        console.log('test')
         setIsLoading(false)
       })
       .catch((error) => {
         console.log('Error: Ne mogu da uzmem podatke', error)
         setIsLoading(false)
       })
+    setChange(false)
     if (editableId === null) return // No need to focus if editableId is null
     if (ref.current) {
       ref.current.focus()
     }
-  }, [tasks, editableId])
+  }, [change, editableId])
 
   const handleInputTask = (event) => {
     setInputTask(event.target.value)
@@ -53,6 +72,7 @@ function ToDo(): JSX.Element {
 
       if (response.ok) {
         setEditableId(null)
+        setChange(true)
         console.log('Uspesno promenjen compleated')
       }
     } catch (error) {
@@ -77,6 +97,7 @@ function ToDo(): JSX.Element {
         if (response.ok) {
           console.log(data.message)
           setInputTask('')
+          setChange(true)
         }
       } catch (error) {
         console.error('An unexpected error occurred', error)
@@ -99,6 +120,7 @@ function ToDo(): JSX.Element {
 
         if (response.ok) {
           setEditableId(null)
+          setChange(true)
           console.log(data.message)
         }
       } catch (error) {
@@ -119,6 +141,7 @@ function ToDo(): JSX.Element {
 
       if (response.ok) {
         console.log(data.message)
+        setChange(true)
       }
     } catch (error) {
       console.error('An unexpected error occurred', error)
@@ -144,53 +167,101 @@ function ToDo(): JSX.Element {
       <div
         className={`flex flex-col bg-transparent overflow-auto scrollbar-none  w-11/12 ${complited ? 'h-1/2' : 'h-full'}  mt-5 mb-5 rounded-lg `}
       >
-        {tasks.map((task) => (
-          <div
-            key={task._id}
-            className="flex justify-between p-2 w-full h-10 bg-gray/30  backdrop-blur-sm rounded-lg text-white  mt-1 mb-1"
-          >
-            <div className="flex w-fit  justify-center items-center ">
-              <label className="cursor-pointer relative">
-                <input
-                  type="checkbox"
-                  onChange={(e) => handleCheckBoxChange(e, task._id)}
-                  className=" h-5 w-5 border-2 border-gray-200 appearance-none hover:border-gray-600 transition duration-500 ease-in-out  rounded-md mr-2 mt-1"
-                />
-                <AiOutlineCheck
-                  className={`h-5 w-5 text-gray-200 hover:text-gray-600 transition duration-500 ease-in-out absolute left-0 top-1 ${task.Compleated ? 'text-opacity-100' : 'text-opacity-0'}`}
-                />
-              </label>
-              {editableId == task._id ? (
-                <input
-                  ref={ref}
-                  type="text"
-                  placeholder={task.Content}
-                  value={editableValue}
-                  onChange={handleInputTaskUpdate}
-                  onKeyDown={(event) => handleKeyDownUpdate(event, task._id)} // Pass event and task id
-                  onBlur={() => setEditableId(null)}
-                  className="w-full h-full bg-transparent rounded-lg text-white pl-4 outline-none"
-                />
-              ) : (
-                <h1 className="text-gray-200">{task.Content}</h1>
-              )}
-            </div>
-            <div className="flex  w-fit h-full">
-              <button onClick={() => handleUpdate(task)}>
-                <AiFillEdit className="flex justify-center items-center mr-2 hover:text-gray-700 transition duration-500 ease-in-out" />
-              </button>
-              <button onClick={() => handleDelete(task._id)}>
-                <AiFillDelete className="flex justify-center items-center hover:text-gray-700 transition duration-500 ease-in-out" />
-              </button>
-            </div>
-          </div>
-        ))}
+        {tasks.map(
+          (task) =>
+            !task.Compleated && (
+              <div
+                key={task._id}
+                className="flex justify-between p-2 w-full h-10 bg-gray/30  backdrop-blur-sm rounded-lg text-white  mt-1 mb-1"
+              >
+                <div className="flex w-fit  justify-center items-center ">
+                  <label className="cursor-pointer relative">
+                    <input
+                      type="checkbox"
+                      onChange={(e) => handleCheckBoxChange(e, task._id)}
+                      checked={task.Compleated}
+                      className=" h-5 w-5 border-2 border-gray-200 appearance-none hover:border-gray-600 transition duration-500 ease-in-out  rounded-md mr-2 mt-1"
+                    />
+                    <AiOutlineCheck
+                      className={`h-5 w-5 text-gray-200 hover:text-gray-600 transition duration-500 ease-in-out absolute left-0 top-1 ${task.Compleated ? 'text-opacity-100' : 'text-opacity-0'}`}
+                    />
+                  </label>
+                  {editableId == task._id ? (
+                    <input
+                      ref={ref}
+                      type="text"
+                      placeholder={task.Content}
+                      value={editableValue}
+                      onChange={handleInputTaskUpdate}
+                      onKeyDown={(event) => handleKeyDownUpdate(event, task._id)} // Pass event and task id
+                      onBlur={() => setEditableId(null)}
+                      className="w-full h-full bg-transparent rounded-lg text-white pl-4 outline-none"
+                    />
+                  ) : (
+                    <h1 className="text-gray-200">{task.Content}</h1>
+                  )}
+                </div>
+                <div className="flex  w-fit h-full">
+                  <button onClick={() => handleUpdate(task)}>
+                    <AiFillEdit className="flex justify-center items-center mr-2 hover:text-gray-700 transition duration-500 ease-in-out" />
+                  </button>
+                  <button onClick={() => handleDelete(task._id)}>
+                    <AiFillDelete className="flex justify-center items-center hover:text-gray-700 transition duration-500 ease-in-out" />
+                  </button>
+                </div>
+              </div>
+            )
+        )}
       </div>
       {complited ? (
         <div
           className={`flex flex-col bg-transparent overflow-auto scrollbar-none  w-11/12 h-1/2 mt-5 mb-5 rounded-lg `}
         >
-          <h1>test</h1>
+          {tasks.map(
+            (task) =>
+              task.Compleated && (
+                <div
+                  key={task._id}
+                  className="flex justify-between p-2 w-full h-10 bg-gray/30  backdrop-blur-sm rounded-lg text-white  mt-1 mb-1"
+                >
+                  <div className="flex w-fit  justify-center items-center ">
+                    <label className="cursor-pointer relative">
+                      <input
+                        type="checkbox"
+                        onChange={(e) => handleCheckBoxChange(e, task._id)}
+                        checked={task.Compleated}
+                        className=" h-5 w-5 border-2 border-gray-200 appearance-none hover:border-gray-600 transition duration-500 ease-in-out  rounded-md mr-2 mt-1"
+                      />
+                      <AiOutlineCheck
+                        className={`h-5 w-5 text-gray-200 hover:text-gray-600 transition duration-500 ease-in-out absolute left-0 top-1 ${task.Compleated ? 'text-opacity-100' : 'text-opacity-0'}`}
+                      />
+                    </label>
+                    {editableId == task._id ? (
+                      <input
+                        ref={ref}
+                        type="text"
+                        placeholder={task.Content}
+                        value={editableValue}
+                        onChange={handleInputTaskUpdate}
+                        onKeyDown={(event) => handleKeyDownUpdate(event, task._id)} // Pass event and task id
+                        onBlur={() => setEditableId(null)}
+                        className="w-full h-full bg-transparent rounded-lg text-white pl-4 outline-none"
+                      />
+                    ) : (
+                      <h1 className="text-gray-200">{task.Content}</h1>
+                    )}
+                  </div>
+                  <div className="flex  w-fit h-full">
+                    <button onClick={() => handleUpdate(task)}>
+                      <AiFillEdit className="flex justify-center items-center mr-2 hover:text-gray-700 transition duration-500 ease-in-out" />
+                    </button>
+                    <button onClick={() => handleDelete(task._id)}>
+                      <AiFillDelete className="flex justify-center items-center hover:text-gray-700 transition duration-500 ease-in-out" />
+                    </button>
+                  </div>
+                </div>
+              )
+          )}
         </div>
       ) : null}
     </div>
