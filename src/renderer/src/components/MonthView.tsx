@@ -23,7 +23,9 @@ function MonthView({ current }): JSX.Element {
   const firstDayofMonth = startOfMonth(currentDay)
   const lastDayOfMonth = endOfMonth(currentDay)
   const [isClicked, setIsClicked] = useState(false)
-  console.log(isClicked)
+  const [isLoading, setIsLoading] = useState(true)
+  const [isEventSet, setIsEventSet] = useState(false)
+  const [date, setDate] = useState(new Date())
   const dayInMonth = eachDayOfInterval({
     start: firstDayofMonth,
     end: lastDayOfMonth
@@ -34,23 +36,42 @@ function MonthView({ current }): JSX.Element {
   const handleCloseEvent = (value) => {
     setIsClicked(value)
   }
+  const handleEventSet = (value) => {
+    setIsEventSet(value)
+  }
 
   useEffect(() => {
     setCurrentDay(current)
   }, [current])
 
-  const handleDiv = (index) => {
-    setEvents((prevState) => [
-      ...prevState,
-      { date: setDate(new Date(), index + 1), title: 'test' }
-    ])
-  }
-  const handleClick = (index) => {
+  useEffect(() => {
+    setIsLoading(true)
+
+    const apiURL = `http://localhost:3000/event`
+
+    fetch(apiURL)
+      .then((res) => res.json())
+      .then((data) => {
+        const eventResult = data || [] // default to an empty array if results is undefine
+        // setArtical(articalResults.articles);
+        setEvents(eventResult)
+        setIsLoading(false)
+      })
+      .catch((error) => {
+        console.log('Error: Ne mogu da uzmem podatke', error)
+        setIsLoading(false)
+      })
+    setIsEventSet(false)
+  }, [isEventSet])
+  const handleClick = (date) => {
     setIsClicked(true)
+    setDate(date)
   }
   return (
     <div className="grid grid-cols-7 gap-2 mt-7   ">
-      {isClicked ? <AddEvent handleCloseEvent={handleCloseEvent} /> : null}
+      {isClicked ? (
+        <AddEvent handleCloseEvent={handleCloseEvent} date={date} handleEventSet={handleEventSet} />
+      ) : null}
       {WEEKDAYS.map((day) => {
         return (
           <div key={day} className="text-center text-gray-300 font-bold">
@@ -71,13 +92,13 @@ function MonthView({ current }): JSX.Element {
           <div
             key={index}
             className={`border-2 border-black h-28 text-gray-300 bg-gray/30  backdrop-blur-sm hover:bg-black/25  transition duration-500 ease-in-out rounded-md text-center ${isToday(day) ? 'bg-gray-500' : ''}`}
-            onClick={() => handleClick(index)}
+            onClick={() => handleClick(day)}
           >
             {format(day, 'd')}
             {events
-              .filter((event) => isSameDay(event.date, day)) // Update to event.data
+              .filter((event) => isSameDay(event.Date, day)) // Update to event.data
               .map((event) => {
-                return <div key={event.title}>{event.title}</div>
+                return <div key={event.Title}>{event.Title}</div>
               })}
           </div>
         )

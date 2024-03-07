@@ -1,9 +1,9 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { AiOutlineClose } from 'react-icons/ai'
 
-function AddEvent({ handleCloseEvent }) {
+function AddEvent({ handleCloseEvent, date, handleEventSet }) {
   const [titleValue, setTitleValue] = useState('')
-
+  const [eventValue, setEventValue] = useState(true)
   const handleClick = () => {
     handleCloseEvent(false)
   }
@@ -11,8 +11,30 @@ function AddEvent({ handleCloseEvent }) {
   const handleTitle = (event) => {
     setTitleValue(event.target.value)
   }
-  const handleSubmit = () => {
-    window.localStorage.setItem('title', titleValue)
+  const handleSubmit = async () => {
+    try {
+      const response = await fetch('http://localhost:3000/event', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          Date: date,
+          Title: titleValue
+        })
+      })
+      const data = await response.json()
+      if (response.ok) {
+        handleCloseEvent(false)
+        handleEventSet(eventValue)
+        setTitleValue('')
+        // window.location.reload()
+      } else {
+        console.error('Failed to set event:', data.message)
+      }
+    } catch (err) {
+      console.error('An unexpected error occurred', err)
+    }
   }
   return (
     <div

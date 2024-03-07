@@ -6,15 +6,20 @@ const Todo = require('../model/todo')
 router.get('/', async (req, res) => {
   try {
     const todo = await Todo.find()
-    res.json(todo)
+    res.status(200).json(todo)
   } catch (err) {
     res.status(500).json({ message: err.message })
   }
 })
 
 //get one
-router.get('/:id', getTodo, (req, res) => {
+router.get('/:id', getTodo, async (req, res) => {
   res.json(res.todo)
+  try {
+    res.status(200).json(res.todo)
+  } catch (err) {
+    res.status(500).json({ message: err.message })
+  }
 })
 
 //creating one
@@ -43,7 +48,7 @@ router.patch('/:id', getTodo, async (req, res) => {
   }
   try {
     const updateTodo = await res.todo.save()
-    res.json(updateTodo)
+    res.status(200).json(updateTodo)
   } catch (err) {
     res.status(500).json({ message: err.message })
   }
