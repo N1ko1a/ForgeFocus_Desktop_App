@@ -148,7 +148,7 @@ function ToDo(): JSX.Element {
     setEditablelValue(task.Content)
   }
   return (
-    <div className="bg-black/40 w-1/4 h-2/3 rounded-2xl backdrop-blur-sm flex flex-col justify-between items-center">
+    <div className="bg-black/40 w-1/4 h-full  rounded-2xl backdrop-blur-sm flex flex-col justify-between items-center">
       <div className="flex w-11/12 h-10 bg-gray/30  backdrop-blur-sm hover:bg-black/25  transition duration-500 ease-in-out rounded-lg mt-5">
         <input
           type="text"
