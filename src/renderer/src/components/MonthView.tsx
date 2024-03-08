@@ -119,14 +119,21 @@ function MonthView({ current }): JSX.Element {
         return (
           <div
             key={index}
-            className={`border-2 border-black h-28 text-gray-300 bg-gray/30  backdrop-blur-sm hover:bg-black/25  transition duration-500 ease-in-out rounded-md text-center ${isToday(day) ? 'bg-gray-500' : ''}`}
+            className={`border-2 border-black h-28 text-gray-300 bg-gray/30  backdrop-blur-sm hover:bg-black/25  transition duration-500 ease-in-out rounded-md text-center overflow-auto scrollbar-none ${isToday(day) ? 'bg-gray-700/70' : ''}`}
             onClick={() => handleClick(day)}
           >
             {format(day, 'd')}
             {events
               .filter((event) => isSameDay(event.Date, day)) // Update to event.data
               .map((event) => {
-                return <div key={event.Title}>{event.Title}</div>
+                return (
+                  <div
+                    key={event.Title}
+                    className="w-full h-fit mb-1 bg-gray-600 rounded-md text-sm truncate"
+                  >
+                    {event.Title}
+                  </div>
+                )
               })}
           </div>
         )
