@@ -1,15 +1,24 @@
 import { useState, useEffect } from 'react'
 import { AiOutlineClose } from 'react-icons/ai'
+import '../main.css'
 
-function AddEvent({ handleCloseEvent, date, handleEventSet }) {
+function AddEvent({ handleCloseEvent, date, handleEventSet, fromFirstValue, toFirstValue }) {
+  console.log(fromFirstValue)
   const [titleValue, setTitleValue] = useState('')
+  const [fromValue, setFromValue] = useState(fromFirstValue)
+  const [toValue, setToValue] = useState(toFirstValue)
   const [eventValue, setEventValue] = useState(true)
   const handleClick = () => {
     handleCloseEvent(false)
   }
-
   const handleTitle = (event) => {
     setTitleValue(event.target.value)
+  }
+  const handleFrom = (event) => {
+    setFromValue(event.target.value)
+  }
+  const handleTo = (event) => {
+    setToValue(event.target.value)
   }
   const handleSubmit = async () => {
     try {
@@ -51,11 +60,30 @@ function AddEvent({ handleCloseEvent, date, handleEventSet }) {
         <div className="flex flex-col justify-center items-center mt-16">
           <input
             type="text"
-            placeholder="Email"
+            placeholder="Add Event"
             value={titleValue}
             onChange={handleTitle}
             className="w-4/5 h-10 m-2 bg-transparent rounded-2xl border-b-2   border-gray-500 text-white pl-4 outline-none"
           />
+          <div className="flex ">
+            <input
+              type="time"
+              value={fromValue}
+              min="1"
+              max="12"
+              onChange={handleFrom}
+              className=" text-center w-36 h-10 m-2 bg-transparent rounded-2xl border-b-2   border-gray-500 text-white  outline-none"
+            />
+
+            <input
+              type="time"
+              value={toValue}
+              min="1"
+              max="12"
+              onChange={handleTo}
+              className=" text-center w-36 h-10 m-2 bg-transparent rounded-2xl border-b-2   border-gray-500 text-white  outline-none"
+            />
+          </div>
           <button
             className=" w-2/5 h-10 mt-5 mb-20 border-b-2  border-gray-500 text-center rounded-xl bg-black/70 outline-none text-gray-400   transition duration-500 ease-in-out hover:text-white "
             onClick={handleSubmit}

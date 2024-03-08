@@ -32,6 +32,8 @@ function MonthView({ current }): JSX.Element {
   })
   const [events, setEvents] = useState<Event[]>([{}])
   const startingDayIndex = (getDay(firstDayofMonth) + 6) % 7
+  const [fromFirstValue, setFromFirstValue] = useState('')
+  const [toFirstValue, setToFirstValue] = useState('')
 
   const handleCloseEvent = (value) => {
     setIsClicked(value)
@@ -67,10 +69,36 @@ function MonthView({ current }): JSX.Element {
     setIsClicked(true)
     setDate(date)
   }
+  useEffect(() => {
+    // Function to get the current time in HH:MM format
+    const getCurrentTime = () => {
+      const now = new Date()
+      const hours = now.getHours().toString().padStart(2, '0')
+      const minutes = now.getMinutes().toString().padStart(2, '0')
+      return `${hours}:${minutes}`
+    }
+    const getCurrentTimeAndOne = () => {
+      const now = new Date()
+      // Add one hour to the current hours
+      const hours = (now.getHours() + 1).toString().padStart(2, '0')
+      const minutes = now.getMinutes().toString().padStart(2, '0')
+      return `${hours}:${minutes}`
+    }
+
+    // Set the current time as the default value for "From" input field
+    setFromFirstValue(getCurrentTime())
+    setToFirstValue(getCurrentTimeAndOne())
+  }, [])
   return (
     <div className="grid grid-cols-7 gap-2 mt-7   ">
       {isClicked ? (
-        <AddEvent handleCloseEvent={handleCloseEvent} date={date} handleEventSet={handleEventSet} />
+        <AddEvent
+          handleCloseEvent={handleCloseEvent}
+          date={date}
+          handleEventSet={handleEventSet}
+          fromFirstValue={fromFirstValue}
+          toFirstValue={toFirstValue}
+        />
       ) : null}
       {WEEKDAYS.map((day) => {
         return (
