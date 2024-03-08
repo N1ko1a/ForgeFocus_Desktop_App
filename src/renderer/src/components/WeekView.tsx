@@ -96,7 +96,7 @@ function WeekView({ current }) {
                 return (
                   <div
                     key={index}
-                    className="border-2 border-black text-gray-300 p-2 mb-2 h-20 rounded-md text-strat bg-gray/30  backdrop-blur-sm hover:bg-black/25  transition duration-500 ease-in-out"
+                    className="overflow-auto scrollbar-none text-center border-2 border-black text-gray-300 p-2 mb-2 h-20 rounded-md text-strat bg-gray/30  backdrop-blur-sm hover:bg-black/25  transition duration-500 ease-in-out"
                   >
                     {events
                       .filter(
@@ -106,7 +106,14 @@ function WeekView({ current }) {
                           timestamp <= event.ToDate
                       )
                       .map((event) => {
-                        return <div key={event.Title}> {event.Title}</div>
+                        return (
+                          <div
+                            key={event.Title}
+                            className=" mb-1 pl-1 bg-gray-700 rounded-md text-sm truncate"
+                          >
+                            {event.Title}
+                          </div>
+                        )
                       })}
                   </div>
                 )

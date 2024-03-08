@@ -1,4 +1,12 @@
-import { eachHourOfInterval, endOfDay, format, isSameDay, isSameHour, startOfDay } from 'date-fns'
+import {
+  addHours,
+  eachHourOfInterval,
+  endOfDay,
+  format,
+  isSameDay,
+  isSameHour,
+  startOfDay
+} from 'date-fns'
 import { useState, useEffect } from 'react'
 import AddEvent from './AddEvent'
 
@@ -22,6 +30,8 @@ function DayView({ current }) {
     start: firstHourOfDay,
     end: lastHourOfDay
   })
+  const [fromFirstValue, setFromFirstValue] = useState('')
+  const [toFirstValue, setToFirstValue] = useState('')
   const [events, setEvents] = useState<Event[]>([{}])
   useEffect(() => {
     setIsLoading(true)
@@ -46,6 +56,15 @@ function DayView({ current }) {
   const handleClick = (date) => {
     setIsClicked(true)
     setDate(date)
+    const hours = date.getHours().toString().padStart(2, '0')
+    const hoursto = (date.getHours() + 1).toString().padStart(2, '0')
+    const minutes = date.getMinutes().toString().padStart(2, '0')
+    const timestamp = `${hours}:${minutes}`
+    const timestampto = `${hoursto}:${minutes}`
+    console.log(timestamp)
+    console.log(timestampto)
+    setFromFirstValue(timestamp)
+    setToFirstValue(timestampto)
   }
   const handleCloseEvent = (value) => {
     setIsClicked(value)
@@ -56,7 +75,13 @@ function DayView({ current }) {
   return (
     <div className="grid grid-cols-1 gap-2 h-86 mt-6 overflow-auto scrollbar-none">
       {isClicked ? (
-        <AddEvent handleCloseEvent={handleCloseEvent} date={date} handleEventSet={handleEventSet} />
+        <AddEvent
+          handleCloseEvent={handleCloseEvent}
+          date={date}
+          handleEventSet={handleEventSet}
+          fromFirstValue={fromFirstValue}
+          toFirstValue={toFirstValue}
+        />
       ) : null}
       {hourInDay.map((hour, index) => {
         const hours = (hour.getHours() + 1).toString().padStart(2, '0')
@@ -65,7 +90,7 @@ function DayView({ current }) {
         return (
           <div
             key={index}
-            className="border-2 border-black text-gray-300 p-2 h-28 rounded-md text-strat bg-gray/30  backdrop-blur-sm hover:bg-black/25  transition duration-500 ease-in-out"
+            className="border-2 border-black text-gray-300 p-2 h-28 rounded-md text-strat bg-gray/30  backdrop-blur-sm hover:bg-black/25  transition duration-500 ease-in-out overflow-auto scrollbar-none"
             onClick={() => handleClick(hour)}
           >
             {format(hour, 'h a')}
@@ -77,7 +102,11 @@ function DayView({ current }) {
                   timestamp <= event.ToDate
               )
               .map((event) => {
-                return <div key={event.Title}> {event.Title}</div>
+                return (
+                  <div key={event.Title} className="bg-gray-700  p-1 mb-1 rounded-md  ">
+                    {event.Title}
+                  </div>
+                )
               })}
           </div>
         )

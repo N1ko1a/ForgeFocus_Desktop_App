@@ -123,18 +123,20 @@ function MonthView({ current }): JSX.Element {
             onClick={() => handleClick(day)}
           >
             {format(day, 'd')}
-            {events
-              .filter((event) => isSameDay(event.Date, day)) // Update to event.data
-              .map((event) => {
-                return (
-                  <div
-                    key={event.Title}
-                    className="w-full h-fit mb-1 bg-gray-600 rounded-md text-sm truncate"
-                  >
-                    {event.Title}
-                  </div>
-                )
-              })}
+            <div className="flex flex-col  items-center">
+              {events
+                .filter((event) => isSameDay(event.Date, day)) // Update to event.data
+                .map((event) => {
+                  return (
+                    <div
+                      key={event.Title}
+                      className=" w-11/12 h-fit mb-1 bg-gray-700 rounded-md text-sm truncate"
+                    >
+                      {event.Title}
+                    </div>
+                  )
+                })}
+            </div>
           </div>
         )
       })}
