@@ -3,7 +3,6 @@ import { AiOutlineClose } from 'react-icons/ai'
 import '../main.css'
 
 function AddEvent({ handleCloseEvent, date, handleEventSet, fromFirstValue, toFirstValue }) {
-  console.log(fromFirstValue)
   const [titleValue, setTitleValue] = useState('')
   const [fromValue, setFromValue] = useState(fromFirstValue)
   const [toValue, setToValue] = useState(toFirstValue)
@@ -29,7 +28,9 @@ function AddEvent({ handleCloseEvent, date, handleEventSet, fromFirstValue, toFi
         },
         body: JSON.stringify({
           Date: date,
-          Title: titleValue
+          Title: titleValue,
+          FromDate: fromValue,
+          ToDate: toValue
         })
       })
       const data = await response.json()

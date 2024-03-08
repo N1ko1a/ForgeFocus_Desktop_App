@@ -18,6 +18,8 @@ interface Event {
 
 function WeekView({ current }) {
   const [currentDay, setCurrentDay] = useState(current || new Date())
+  const [isLoading, setIsLoading] = useState(true)
+  const [isEventSet, setIsEventSet] = useState(false)
   useEffect(() => {
     setCurrentDay(current)
   }, [current])
@@ -35,6 +37,26 @@ function WeekView({ current }) {
     start: firstHourOfDay,
     end: lastHourOfDay
   })
+
+  useEffect(() => {
+    setIsLoading(true)
+
+    const apiURL = `http://localhost:3000/event`
+
+    fetch(apiURL)
+      .then((res) => res.json())
+      .then((data) => {
+        const eventResult = data || [] // default to an empty array if results is undefine
+        // setArtical(articalResults.articles);
+        setEvents(eventResult)
+        setIsLoading(false)
+      })
+      .catch((error) => {
+        console.log('Error: Ne mogu da uzmem podatke', error)
+        setIsLoading(false)
+      })
+    setIsEventSet(false)
+  }, [isEventSet])
 
   return (
     <div className="grid grid-cols-8 gap-2 h-86 mt-6 overflow-auto scrollbar-none">
@@ -67,6 +89,10 @@ function WeekView({ current }) {
             </div>
             <div className="grid grid-cols-1 gap-0">
               {hourInDay.map((hour, index) => {
+                const hours = (hour.getHours() + 1).toString().padStart(2, '0')
+                const minutes = hour.getMinutes().toString().padStart(2, '0')
+                const timestamp = `${hours}:${minutes}`
+
                 return (
                   <div
                     key={index}
@@ -75,10 +101,12 @@ function WeekView({ current }) {
                     {events
                       .filter(
                         (event) =>
-                          isSameDay(event.date, day) && event.date.getHours() === hour.getHours()
+                          isSameDay(event.Date, day) &&
+                          timestamp >= event.FromDate &&
+                          timestamp <= event.ToDate
                       )
                       .map((event) => {
-                        return <div key={event.title}> {event.title}</div>
+                        return <div key={event.Title}> {event.Title}</div>
                       })}
                   </div>
                 )

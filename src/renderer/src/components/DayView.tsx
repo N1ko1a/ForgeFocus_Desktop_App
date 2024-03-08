@@ -46,7 +46,6 @@ function DayView({ current }) {
   const handleClick = (date) => {
     setIsClicked(true)
     setDate(date)
-    console.log(date)
   }
   const handleCloseEvent = (value) => {
     setIsClicked(value)
@@ -60,6 +59,9 @@ function DayView({ current }) {
         <AddEvent handleCloseEvent={handleCloseEvent} date={date} handleEventSet={handleEventSet} />
       ) : null}
       {hourInDay.map((hour, index) => {
+        const hours = (hour.getHours() + 1).toString().padStart(2, '0')
+        const minutes = hour.getMinutes().toString().padStart(2, '0')
+        const timestamp = `${hours}:${minutes}`
         return (
           <div
             key={index}
@@ -68,7 +70,12 @@ function DayView({ current }) {
           >
             {format(hour, 'h a')}
             {events
-              .filter((event) => isSameDay(event.Date, hour) && isSameHour(event.Date, hour))
+              .filter(
+                (event) =>
+                  isSameDay(event.Date, hour) &&
+                  timestamp >= event.FromDate &&
+                  timestamp <= event.ToDate
+              )
               .map((event) => {
                 return <div key={event.Title}> {event.Title}</div>
               })}

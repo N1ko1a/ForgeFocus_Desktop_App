@@ -29,10 +29,18 @@ router.post('/', async (req, res) => {
   if (!req.body.Title) {
     return res.status(400).json({ message: 'Morate da unesete naziv' })
   }
+  if (!req.body.FromDate) {
+    return res.status(400).json({ message: 'Morate da unesete od vreme' })
+  }
+  if (!req.body.ToDate) {
+    return res.status(400).json({ message: 'Morate da unesete do vreme' })
+  }
 
   const event = new Events({
     Date: req.body.Date,
-    Title: req.body.Title
+    Title: req.body.Title,
+    FromDate: req.body.FromDate,
+    ToDate: req.body.ToDate
   })
   try {
     const newEvent = await event.save()
