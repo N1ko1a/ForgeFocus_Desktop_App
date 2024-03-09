@@ -9,6 +9,7 @@ import {
 } from 'date-fns'
 import { useState, useEffect } from 'react'
 import AddEvent from './AddEvent'
+import EventOptions from './EventOptions'
 
 interface Event {
   date: Date
@@ -25,6 +26,12 @@ function DayView({ current }) {
   const [isLoading, setIsLoading] = useState(true)
   const [isEventSet, setIsEventSet] = useState(false)
   const [isClicked, setIsClicked] = useState(false)
+  const [isEventClicked, setIsEventClicked] = useState(false)
+  const [isEventChange, setIsEventChange] = useState(false)
+  const [fromFirstValueEvent, setFromFirstValueEvent] = useState('')
+  const [toFirstValueEvent, setToFirstValueEvent] = useState('')
+  const [eventId, setEventId] = useState(0)
+  const [eventTitle, setEventTitle] = useState('')
   const [date, setDate] = useState(new Date())
   const hourInDay = eachHourOfInterval({
     start: firstHourOfDay,
@@ -51,7 +58,8 @@ function DayView({ current }) {
         setIsLoading(false)
       })
     setIsEventSet(false)
-  }, [isEventSet])
+    setIsEventChange(false)
+  }, [isEventSet, isEventChange])
 
   const handleClick = (date) => {
     setIsClicked(true)
@@ -61,8 +69,6 @@ function DayView({ current }) {
     const minutes = date.getMinutes().toString().padStart(2, '0')
     const timestamp = `${hours}:${minutes}`
     const timestampto = `${hoursto}:${minutes}`
-    console.log(timestamp)
-    console.log(timestampto)
     setFromFirstValue(timestamp)
     setToFirstValue(timestampto)
   }
@@ -71,6 +77,19 @@ function DayView({ current }) {
   }
   const handleEventSet = (value) => {
     setIsEventSet(value)
+  }
+  const handleEventChange = (value) => {
+    setIsEventChange(value)
+  }
+  const handleCloseEventOptions = (value) => {
+    setIsEventClicked(value)
+  }
+  const handleEventClick = (value, value1, value2, value3) => {
+    setIsEventClicked(true)
+    setFromFirstValueEvent(value)
+    setToFirstValueEvent(value1)
+    setEventId(value2)
+    setEventTitle(value3)
   }
   return (
     <div className="grid grid-cols-1 gap-2 h-86 mt-6 overflow-auto scrollbar-none">
@@ -81,6 +100,17 @@ function DayView({ current }) {
           handleEventSet={handleEventSet}
           fromFirstValue={fromFirstValue}
           toFirstValue={toFirstValue}
+        />
+      ) : null}
+      {isEventClicked ? (
+        <EventOptions
+          handleCloseEventOptions={handleCloseEventOptions}
+          date={date}
+          handleEventChange={handleEventChange}
+          fromFirstValueEvent={fromFirstValueEvent}
+          toFirstValueEvent={toFirstValueEvent}
+          eventId={eventId}
+          eventTitle={eventTitle}
         />
       ) : null}
       {hourInDay.map((hour, index) => {
@@ -102,8 +132,17 @@ function DayView({ current }) {
                   timestamp <= event.ToDate
               )
               .map((event) => {
+                const handleEventClickWithArgs = (e) => {
+                  e.stopPropagation()
+                  handleEventClick(event.FromDate, event.ToDate, event._id, event.Title)
+                }
+
                 return (
-                  <div key={event.Title} className="bg-gray-700  p-1 mb-1 rounded-md  ">
+                  <div
+                    key={event.Title}
+                    onClick={handleEventClickWithArgs}
+                    className=" hover:cursor-pointer bg-gray-700  p-1 mb-1 rounded-md  "
+                  >
                     {event.Title}
                   </div>
                 )

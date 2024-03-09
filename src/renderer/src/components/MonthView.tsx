@@ -79,6 +79,7 @@ function MonthView({ current }): JSX.Element {
     setIsEventSet(false)
     setIsEventChange(false)
   }, [isEventSet, isEventChange])
+
   const handleClick = (date) => {
     setIsClicked(true)
     setDate(date)
@@ -166,7 +167,7 @@ function MonthView({ current }): JSX.Element {
                   return (
                     <div
                       key={event.Title}
-                      className=" w-11/12 h-fit mb-1 bg-gray-700 rounded-md text-sm truncate"
+                      className=" w-11/12 h-fit mb-1 bg-gray-700 rounded-md text-sm truncate hover:cursor-pointer"
                       onClick={handleEventClickWithArgs}
                     >
                       {event.Title}

@@ -10,6 +10,8 @@ import {
   isSameDay
 } from 'date-fns'
 import { useState, useEffect } from 'react'
+import AddEvent from './AddEvent'
+import EventOptions from './EventOptions'
 
 interface Event {
   date: Date
@@ -19,7 +21,17 @@ interface Event {
 function WeekView({ current }) {
   const [currentDay, setCurrentDay] = useState(current || new Date())
   const [isLoading, setIsLoading] = useState(true)
+  const [isClicked, setIsClicked] = useState(false)
+  const [isEventClicked, setIsEventClicked] = useState(false)
+  const [fromFirstValue, setFromFirstValue] = useState('')
+  const [date, setDate] = useState(new Date())
+  const [toFirstValue, setToFirstValue] = useState('')
   const [isEventSet, setIsEventSet] = useState(false)
+  const [isEventChange, setIsEventChange] = useState(false)
+  const [fromFirstValueEvent, setFromFirstValueEvent] = useState('')
+  const [toFirstValueEvent, setToFirstValueEvent] = useState('')
+  const [eventId, setEventId] = useState(0)
+  const [eventTitle, setEventTitle] = useState('')
   useEffect(() => {
     setCurrentDay(current)
   }, [current])
@@ -56,10 +68,62 @@ function WeekView({ current }) {
         setIsLoading(false)
       })
     setIsEventSet(false)
-  }, [isEventSet])
+    setIsEventChange(false)
+  }, [isEventSet, isEventChange])
 
+  const handleClick = (date) => {
+    setIsClicked(true)
+    setDate(date)
+    const hours = date.getHours().toString().padStart(2, '0')
+    const hoursto = (date.getHours() + 1).toString().padStart(2, '0')
+    const minutes = date.getMinutes().toString().padStart(2, '0')
+    const timestamp = `${hours}:${minutes}`
+    const timestampto = `${hoursto}:${minutes}`
+    setFromFirstValue(timestamp)
+    setToFirstValue(timestampto)
+  }
+  const handleCloseEvent = (value) => {
+    setIsClicked(value)
+  }
+  const handleEventSet = (value) => {
+    setIsEventSet(value)
+  }
+  const handleEventChange = (value) => {
+    setIsEventChange(value)
+  }
+  const handleCloseEventOptions = (value) => {
+    setIsEventClicked(value)
+  }
+  const handleEventClick = (value, value1, value2, value3) => {
+    setIsEventClicked(true)
+    setFromFirstValueEvent(value)
+    setToFirstValueEvent(value1)
+    setEventId(value2)
+    setEventTitle(value3)
+  }
   return (
     <div className="grid grid-cols-8 gap-2 h-86 mt-6 overflow-auto scrollbar-none">
+      {isClicked ? (
+        <AddEvent
+          handleCloseEvent={handleCloseEvent}
+          date={date}
+          handleEventSet={handleEventSet}
+          fromFirstValue={fromFirstValue}
+          toFirstValue={toFirstValue}
+        />
+      ) : null}
+
+      {isEventClicked ? (
+        <EventOptions
+          handleCloseEventOptions={handleCloseEventOptions}
+          date={date}
+          handleEventChange={handleEventChange}
+          fromFirstValueEvent={fromFirstValueEvent}
+          toFirstValueEvent={toFirstValueEvent}
+          eventId={eventId}
+          eventTitle={eventTitle}
+        />
+      ) : null}
       <div>
         <div className="border-2 border-black text-gray-300 p-2 h-20 mb-2 rounded-md text-strat bg-gray/30  backdrop-blur-sm ">
           Hours
@@ -96,6 +160,7 @@ function WeekView({ current }) {
                 return (
                   <div
                     key={index}
+                    onClick={() => handleClick(day)}
                     className="overflow-auto scrollbar-none text-center border-2 border-black text-gray-300 p-2 mb-2 h-20 rounded-md text-strat bg-gray/30  backdrop-blur-sm hover:bg-black/25  transition duration-500 ease-in-out"
                   >
                     {events
@@ -106,10 +171,16 @@ function WeekView({ current }) {
                           timestamp <= event.ToDate
                       )
                       .map((event) => {
+                        const handleEventClickWithArgs = (e) => {
+                          e.stopPropagation()
+                          handleEventClick(event.FromDate, event.ToDate, event._id, event.Title)
+                        }
+
                         return (
                           <div
                             key={event.Title}
-                            className=" mb-1 pl-1 bg-gray-700 rounded-md text-sm truncate"
+                            onClick={handleEventClickWithArgs}
+                            className=" hover:cursor-pointer mb-1 pl-1 bg-gray-700 rounded-md text-sm truncate"
                           >
                             {event.Title}
                           </div>
