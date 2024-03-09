@@ -26,6 +26,7 @@ function MonthView({ current }): JSX.Element {
   const [isClicked, setIsClicked] = useState(false)
   const [isEventClicked, setIsEventClicked] = useState(false)
   const [eventId, setEventId] = useState(0)
+  const [eventTitle, setEventTitle] = useState('')
   const [isLoading, setIsLoading] = useState(true)
   const [isEventSet, setIsEventSet] = useState(false)
   const [isEventChange, setIsEventChange] = useState(false)
@@ -82,11 +83,12 @@ function MonthView({ current }): JSX.Element {
     setIsClicked(true)
     setDate(date)
   }
-  const handleEventClick = (value, value1, value2) => {
+  const handleEventClick = (value, value1, value2, value3) => {
     setIsEventClicked(true)
     setFromFirstValueEvent(value)
     setToFirstValueEvent(value1)
     setEventId(value2)
+    setEventTitle(value3)
   }
   useEffect(() => {
     // Function to get the current time in HH:MM format
@@ -127,6 +129,7 @@ function MonthView({ current }): JSX.Element {
           fromFirstValueEvent={fromFirstValueEvent}
           toFirstValueEvent={toFirstValueEvent}
           eventId={eventId}
+          eventTitle={eventTitle}
         />
       ) : null}
       {WEEKDAYS.map((day) => {
@@ -158,7 +161,7 @@ function MonthView({ current }): JSX.Element {
                 .map((event) => {
                   const handleEventClickWithArgs = (e) => {
                     e.stopPropagation()
-                    handleEventClick(event.FromDate, event.ToDate, event._id)
+                    handleEventClick(event.FromDate, event.ToDate, event._id, event.Title)
                   }
                   return (
                     <div

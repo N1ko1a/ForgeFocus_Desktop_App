@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { AiOutlineClose } from 'react-icons/ai'
 import '../main.css'
 
@@ -8,12 +8,16 @@ function EventOptions({
   handleEventChange,
   fromFirstValueEvent,
   toFirstValueEvent,
-  eventId
+  eventId,
+  eventTitle
 }) {
-  const [titleValue, setTitleValue] = useState('')
+  const [titleValue, setTitleValue] = useState(eventTitle)
   const [fromValue, setFromValue] = useState(fromFirstValueEvent)
   const [toValue, setToValue] = useState(toFirstValueEvent)
   const [eventValue, setEventValue] = useState(true)
+  const ref = useRef(null)
+  const fromRef = useRef(null)
+  const toRef = useRef(null)
   const handleClick = () => {
     handleCloseEventOptions(false)
   }
@@ -52,6 +56,12 @@ function EventOptions({
       console.error('An unexpected error occurred', err)
     }
   }
+  useEffect(() => {
+    if (eventId === null) return // No need to focus if editableId is null
+    if (ref.current) {
+      ref.current.focus()
+    }
+  }, [eventId])
   // const handleSubmit = async () => {
   //   try {
   //     const response = await fetch('http://localhost:3000/event', {
@@ -79,6 +89,18 @@ function EventOptions({
   //     console.error('An unexpected error occurred', err)
   //   }
   // }
+  const handleKeyPress = (event) => {
+    if (event.key === 'Enter') {
+      if (event.target === ref.current) {
+        fromRef.current.focus()
+      } else if (event.target === fromRef.current) {
+        toRef.current.focus()
+      } else if (event.target === toRef.current) {
+        handleEdit()
+      }
+    }
+  }
+
   return (
     <div
       className=" fixed top-0 left-0  w-full h-full
@@ -93,28 +115,34 @@ function EventOptions({
         </div>
         <div className="flex flex-col justify-center items-center mt-16">
           <input
+            ref={ref}
             type="text"
             placeholder="Add Event"
             value={titleValue}
             onChange={handleTitle}
+            onKeyPress={handleKeyPress}
             className="w-4/5 h-10 m-2 bg-transparent rounded-2xl border-b-2   border-gray-500 text-white pl-4 outline-none"
           />
           <div className="flex ">
             <input
+              ref={fromRef}
               type="time"
               value={fromValue}
               min="1"
               max="12"
               onChange={handleFrom}
+              onKeyPress={handleKeyPress}
               className=" text-center w-36 h-10 m-2 bg-transparent rounded-2xl border-b-2   border-gray-500 text-white  outline-none"
             />
 
             <input
+              ref={toRef}
               type="time"
               value={toValue}
               min="1"
               max="12"
               onChange={handleTo}
+              onKeyPress={handleKeyPress}
               className=" text-center w-36 h-10 m-2 bg-transparent rounded-2xl border-b-2   border-gray-500 text-white  outline-none"
             />
           </div>
