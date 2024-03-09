@@ -11,15 +11,6 @@ function Kalendar(): JSX.Element {
   const [buttWeek, setButtWeek] = useState(false)
   const [buttDay, setButtDay] = useState(false)
 
-  const test = () => {
-    Notification.requestPermission().then((perm) => {
-      if (perm === 'granted') {
-        new Notification('Example Notification', {
-          body: 'This is more text'
-        })
-      }
-    })
-  }
   const handleMonthPrev = () => {
     setCurrentDay(subMonths(currentDay, 1))
   }
@@ -122,7 +113,6 @@ function Kalendar(): JSX.Element {
           >
             Day
           </button>
-          <button onClick={test}>Test</button>
         </div>
       </div>
       {buttMonth ? <MonthView current={currentDay} /> : null}
