@@ -10,6 +10,7 @@ import {
 } from 'date-fns'
 import { useEffect, useState } from 'react'
 import AddEvent from './AddEvent'
+import EventOptions from './EventOptions'
 // import AddEvent from './AddEvent'
 
 interface Event {
@@ -23,8 +24,11 @@ function MonthView({ current }): JSX.Element {
   const firstDayofMonth = startOfMonth(currentDay)
   const lastDayOfMonth = endOfMonth(currentDay)
   const [isClicked, setIsClicked] = useState(false)
+  const [isEventClicked, setIsEventClicked] = useState(false)
+  const [eventId, setEventId] = useState(0)
   const [isLoading, setIsLoading] = useState(true)
   const [isEventSet, setIsEventSet] = useState(false)
+  const [isEventChange, setIsEventChange] = useState(false)
   const [date, setDate] = useState(new Date())
   const dayInMonth = eachDayOfInterval({
     start: firstDayofMonth,
@@ -34,12 +38,20 @@ function MonthView({ current }): JSX.Element {
   const startingDayIndex = (getDay(firstDayofMonth) + 6) % 7
   const [fromFirstValue, setFromFirstValue] = useState('')
   const [toFirstValue, setToFirstValue] = useState('')
+  const [fromFirstValueEvent, setFromFirstValueEvent] = useState('')
+  const [toFirstValueEvent, setToFirstValueEvent] = useState('')
 
   const handleCloseEvent = (value) => {
     setIsClicked(value)
   }
   const handleEventSet = (value) => {
     setIsEventSet(value)
+  }
+  const handleEventChange = (value) => {
+    setIsEventChange(value)
+  }
+  const handleCloseEventOptions = (value) => {
+    setIsEventClicked(value)
   }
 
   useEffect(() => {
@@ -64,10 +76,17 @@ function MonthView({ current }): JSX.Element {
         setIsLoading(false)
       })
     setIsEventSet(false)
-  }, [isEventSet])
+    setIsEventChange(false)
+  }, [isEventSet, isEventChange])
   const handleClick = (date) => {
     setIsClicked(true)
     setDate(date)
+  }
+  const handleEventClick = (value, value1, value2) => {
+    setIsEventClicked(true)
+    setFromFirstValueEvent(value)
+    setToFirstValueEvent(value1)
+    setEventId(value2)
   }
   useEffect(() => {
     // Function to get the current time in HH:MM format
@@ -100,6 +119,16 @@ function MonthView({ current }): JSX.Element {
           toFirstValue={toFirstValue}
         />
       ) : null}
+      {isEventClicked ? (
+        <EventOptions
+          handleCloseEventOptions={handleCloseEventOptions}
+          date={date}
+          handleEventChange={handleEventChange}
+          fromFirstValueEvent={fromFirstValueEvent}
+          toFirstValueEvent={toFirstValueEvent}
+          eventId={eventId}
+        />
+      ) : null}
       {WEEKDAYS.map((day) => {
         return (
           <div key={day} className="text-center text-gray-300 font-bold">
@@ -127,10 +156,15 @@ function MonthView({ current }): JSX.Element {
               {events
                 .filter((event) => isSameDay(event.Date, day)) // Update to event.data
                 .map((event) => {
+                  const handleEventClickWithArgs = (e) => {
+                    e.stopPropagation()
+                    handleEventClick(event.FromDate, event.ToDate, event._id)
+                  }
                   return (
                     <div
                       key={event.Title}
                       className=" w-11/12 h-fit mb-1 bg-gray-700 rounded-md text-sm truncate"
+                      onClick={handleEventClickWithArgs}
                     >
                       {event.Title}
                     </div>

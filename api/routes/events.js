@@ -58,6 +58,12 @@ router.patch('/:id', getEvent, async (req, res) => {
   if (req.body.Title != null) {
     res.event.Title = req.body.Title
   }
+  if (req.body.FromDate != null) {
+    res.event.FromDate = req.body.FromDate
+  }
+  if (req.body.ToDate != null) {
+    res.event.ToDate = req.body.ToDate
+  }
   try {
     const updateEvent = await res.event.save()
     res.status(200).json(updateEvent)
