@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { AiFillDelete, AiOutlineCheck, AiFillEdit } from 'react-icons/ai'
+import AddButton from './AddButton'
 
 function ToDo(): JSX.Element {
   const [tasks, setTasks] = useState([])
@@ -10,11 +11,42 @@ function ToDo(): JSX.Element {
   const [editableValue, setEditablelValue] = useState('')
   const [complited, setComplited] = useState(false)
   const [change, setChange] = useState(false)
+  const [buttonChange, setButtonChange] = useState(false)
+  const [buttons, setButtons] = useState([])
+  const [currentButton, setCurrentButton] = useState('Today')
+  const [isButtonClicked, setIsButtonClicked] = useState(false)
+  console.log('Current Button: ', currentButton)
   const ref = useRef(null)
+
+  const addNewButton = () => {
+    setIsButtonClicked(true)
+  }
+
+  const handleButtonClick = (buttonId) => {
+    setCurrentButton(buttonId)
+  }
 
   useEffect(() => {
     setIsLoading(true)
-    const apiURL = `http://localhost:3000/todo`
+    const apiURL = `http://localhost:3000/buttons`
+    fetch(apiURL)
+      .then((res) => res.json())
+      .then((data) => {
+        const buttonsResult = data || []
+        console.log(buttonsResult)
+        setButtons(buttonsResult)
+        setIsLoading(false)
+      })
+      .catch((error) => {
+        console.log('Error: Ne mogu da uzmem podatke', error)
+        setIsLoading(false)
+      })
+    setButtonChange(false)
+  }, [buttonChange])
+
+  useEffect(() => {
+    setIsLoading(true)
+    const apiURL = `http://localhost:3000/todo?workspace=${currentButton}`
     fetch(apiURL)
       .then((res) => res.json())
       .then((data) => {
@@ -43,7 +75,7 @@ function ToDo(): JSX.Element {
     if (ref.current) {
       ref.current.focus()
     }
-  }, [change, editableId])
+  }, [change, editableId, currentButton])
 
   const handleInputTask = (event) => {
     setInputTask(event.target.value)
@@ -84,7 +116,8 @@ function ToDo(): JSX.Element {
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({
-            Content: inputTask
+            Content: inputTask,
+            Workspace: currentButton
           })
         })
         const data = await response.json()
@@ -147,8 +180,25 @@ function ToDo(): JSX.Element {
     setEditableId(task._id)
     setEditablelValue(task.Content)
   }
+  const handleCloseButton = (value) => {
+    setIsButtonClicked(value)
+  }
   return (
     <div className="bg-black/40 w-1/4 h-full  rounded-2xl backdrop-blur-sm flex flex-col justify-between items-center">
+      {isButtonClicked ? <AddButton handleCloseButton={handleCloseButton} /> : null}
+      <div className="flex w-11/12 h-10 text-white overflow-auto scrollbar-none">
+        <button key="Today" onClick={() => handleButtonClick('Today')}>
+          Today
+        </button>
+        {buttons.map((button) => {
+          return (
+            <button key={button.Name} onClick={() => handleButtonClick(button.Name)}>
+              {button.Name}
+            </button>
+          )
+        })}
+        <button onClick={addNewButton}>Kreiraj dugme</button>
+      </div>
       <div className="flex w-11/12 h-10 bg-gray/30  backdrop-blur-sm hover:bg-black/25  transition duration-500 ease-in-out rounded-lg mt-5">
         <input
           type="text"

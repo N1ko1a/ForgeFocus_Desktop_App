@@ -31,4 +31,7 @@ app.use('/todo', todoRoute)
 const eventRouter = require('./routes/events')
 app.use('/event', eventRouter)
 
+const buttonsRouter = require('./routes/buttons')
+app.use('/buttons', buttonsRouter)
+
 app.listen(3000, () => console.log('Server strated'))

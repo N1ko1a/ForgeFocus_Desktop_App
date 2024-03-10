@@ -2,10 +2,19 @@ const express = require('express')
 const router = express.Router()
 const Todo = require('../model/todo')
 
-//get all
 router.get('/', async (req, res) => {
   try {
-    const todo = await Todo.find()
+    let query = {} // Inicijalizujemo prazan query objekat
+
+    // Provjeravamo da li je proslijeđen query parametar za pretragu po "Workspace"
+    if (req.query.workspace) {
+      // Ako jeste, kreiramo regex objekat za pretragu po "Workspace" polju
+      const workspaceRegex = new RegExp(req.query.workspace, 'i') // 'i' znači da je pretraga case-insensitive
+      query = { Workspace: workspaceRegex } // Postavljamo query da pretražuje "Workspace" polje
+    }
+
+    // Izvršavamo upit na bazi podataka sa kreiranim query objektom
+    const todo = await Todo.find(query)
     res.status(200).json(todo)
   } catch (err) {
     res.status(500).json({ message: err.message })
@@ -27,8 +36,12 @@ router.post('/', async (req, res) => {
   if (!req.body.Content) {
     return res.status(400).json({ message: 'Morate da unesete task' })
   }
+  if (!req.body.Workspace) {
+    return res.status(400).json({ message: 'Morate da unesete Workspace' })
+  }
   const todo = new Todo({
-    Content: req.body.Content
+    Content: req.body.Content,
+    Workspace: req.body.Workspace
   })
   try {
     const newTodo = await todo.save()
@@ -45,6 +58,9 @@ router.patch('/:id', getTodo, async (req, res) => {
   }
   if (req.body.Compleated != null) {
     res.todo.Compleated = req.body.Compleated
+  }
+  if (req.body.Workspace != null) {
+    res.todo.Workspace = req.body.Workspace
   }
   try {
     const updateTodo = await res.todo.save()

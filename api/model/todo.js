@@ -5,6 +5,10 @@ const todoSchema = new mongoose.Schema({
     type: String,
     require: true
   },
+  Workspace: {
+    type: String,
+    default: 'Today'
+  },
   Compleated: {
     type: Boolean,
     default: false
