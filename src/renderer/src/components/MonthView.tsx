@@ -112,7 +112,7 @@ function MonthView({ current }): JSX.Element {
     setToFirstValue(getCurrentTimeAndOne())
   }, [])
   return (
-    <div className="grid grid-cols-7 gap-2 mt-7   ">
+    <div className="grid grid-cols-7 gap-2  h-full  overflow-auto 2xl:overflow-hidden scrollbar-none ">
       {isClicked ? (
         <AddEvent
           handleCloseEvent={handleCloseEvent}
@@ -135,7 +135,7 @@ function MonthView({ current }): JSX.Element {
       ) : null}
       {WEEKDAYS.map((day) => {
         return (
-          <div key={day} className="text-center text-gray-300 font-bold">
+          <div key={day} className="text-center text-gray-300 h-fit text-xs xl:text-base font-bold">
             {day}
           </div>
         )
@@ -144,7 +144,7 @@ function MonthView({ current }): JSX.Element {
         return (
           <div
             key={`empty-${index}`}
-            className="border-2 border-black h-28 rounded-md bg-gray/30  backdrop-blur-sm hover:bg-black/25  transition duration-500 ease-in-out  text-center"
+            className="border-2 border-black h-16 xl:h-28 rounded-md bg-gray/30  backdrop-blur-sm hover:bg-black/25  transition duration-500 ease-in-out  text-center"
           />
         )
       })}
@@ -152,7 +152,7 @@ function MonthView({ current }): JSX.Element {
         return (
           <div
             key={index}
-            className={`border-2 border-black h-28 text-gray-300 bg-gray/30  backdrop-blur-sm hover:bg-black/25  transition duration-500 ease-in-out rounded-md text-center overflow-auto scrollbar-none ${isToday(day) ? 'bg-gray-700/70' : ''}`}
+            className={`border-2 border-black h-16 xl:h-28 text-gray-300 bg-gray/30  backdrop-blur-sm hover:bg-black/25  transition duration-500 ease-in-out rounded-md text-center overflow-auto scrollbar-none ${isToday(day) ? 'bg-gray-700/70' : ''}`}
             onClick={() => handleClick(day)}
           >
             {format(day, 'd')}
@@ -226,6 +226,7 @@ function MonthView({ current }): JSX.Element {
           </div>
         )
       })}
+      <div className="h-28"></div>
     </div>
   )
 }

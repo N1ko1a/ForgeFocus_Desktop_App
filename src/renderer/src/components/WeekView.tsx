@@ -102,7 +102,7 @@ function WeekView({ current }) {
     setEventTitle(value3)
   }
   return (
-    <div className="grid grid-cols-8 gap-2 h-86 mt-6 overflow-auto scrollbar-none">
+    <div className="grid grid-cols-8 gap-2 h-full  overflow-auto scrollbar-none">
       {isClicked ? (
         <AddEvent
           handleCloseEvent={handleCloseEvent}

@@ -208,7 +208,7 @@ function ToDo(): JSX.Element {
     setButtonSettingsChange(value)
   }
   return (
-    <div className="bg-black/40 w-1/4 h-full  rounded-2xl backdrop-blur-sm flex flex-col justify-between items-center">
+    <div className="bg-black/40 min-w-2/4  lg:w-1/4  h-full  rounded-2xl backdrop-blur-sm flex flex-col justify-between items-center">
       {isButtonClicked ? (
         <AddButton
           handleCloseButton={handleCloseButton}

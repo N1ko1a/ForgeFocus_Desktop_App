@@ -92,7 +92,7 @@ function DayView({ current }) {
     setEventTitle(value3)
   }
   return (
-    <div className="grid grid-cols-1 gap-2 h-86 mt-6 overflow-auto scrollbar-none">
+    <div className="grid grid-cols-1 gap-2 h-full  overflow-auto scrollbar-none">
       {isClicked ? (
         <AddEvent
           handleCloseEvent={handleCloseEvent}
@@ -120,7 +120,7 @@ function DayView({ current }) {
         return (
           <div
             key={index}
-            className="border-2 border-black text-gray-300 p-2 h-28 rounded-md text-strat bg-gray/30  backdrop-blur-sm hover:bg-black/25  transition duration-500 ease-in-out overflow-auto scrollbar-none"
+            className="border-2 border-black text-gray-300 p-2 h-20 xl:h-28  rounded-md text-strat bg-gray/30  backdrop-blur-sm hover:bg-black/25  transition duration-500 ease-in-out overflow-auto scrollbar-none"
             onClick={() => handleClick(hour)}
           >
             {format(hour, 'h a')}
