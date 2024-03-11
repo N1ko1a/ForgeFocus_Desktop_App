@@ -1,7 +1,10 @@
 import { useEffect, useState, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { AiFillDelete, AiOutlineCheck, AiFillEdit } from 'react-icons/ai'
+import { AiFillDelete, AiOutlineCheck, AiFillEdit, AiOutlinePlus } from 'react-icons/ai'
+import { GrChapterAdd } from 'react-icons/gr'
+import { IoMdSettings } from 'react-icons/io'
 import AddButton from './AddButton'
+import ButtonSettings from './ButtonSettings'
 
 function ToDo(): JSX.Element {
   const [tasks, setTasks] = useState([])
@@ -12,14 +15,26 @@ function ToDo(): JSX.Element {
   const [complited, setComplited] = useState(false)
   const [change, setChange] = useState(false)
   const [buttonChange, setButtonChange] = useState(false)
+  const [buttonSettingsChange, setButtonSettingsChange] = useState(false)
   const [buttons, setButtons] = useState([])
   const [currentButton, setCurrentButton] = useState('Today')
   const [isButtonClicked, setIsButtonClicked] = useState(false)
-  console.log('Current Button: ', currentButton)
+  const [isButtonSettingClicked, setIsButtonSettingsClicked] = useState(false)
+  const [focus, setFocus] = useState(true)
   const ref = useRef(null)
+  const containerRef = useRef(null)
+
+  const handleMouseWheel = (e) => {
+    if (containerRef.current) {
+      containerRef.current.scrollLeft += e.deltaY
+    }
+  }
 
   const addNewButton = () => {
     setIsButtonClicked(true)
+  }
+  const settingsButton = () => {
+    setIsButtonSettingsClicked(true)
   }
 
   const handleButtonClick = (buttonId) => {
@@ -33,7 +48,6 @@ function ToDo(): JSX.Element {
       .then((res) => res.json())
       .then((data) => {
         const buttonsResult = data || []
-        console.log(buttonsResult)
         setButtons(buttonsResult)
         setIsLoading(false)
       })
@@ -42,7 +56,8 @@ function ToDo(): JSX.Element {
         setIsLoading(false)
       })
     setButtonChange(false)
-  }, [buttonChange])
+    handleButtonSettingsChange(false)
+  }, [buttonChange, buttonSettingsChange])
 
   useEffect(() => {
     setIsLoading(true)
@@ -75,7 +90,7 @@ function ToDo(): JSX.Element {
     if (ref.current) {
       ref.current.focus()
     }
-  }, [change, editableId, currentButton])
+  }, [change, editableId, currentButton, buttonSettingsChange])
 
   const handleInputTask = (event) => {
     setInputTask(event.target.value)
@@ -183,23 +198,68 @@ function ToDo(): JSX.Element {
   const handleCloseButton = (value) => {
     setIsButtonClicked(value)
   }
+  const handleButtonChange = (value) => {
+    setButtonChange(value)
+  }
+  const handleCloseButtonSettings = (value) => {
+    setIsButtonSettingsClicked(value)
+  }
+  const handleButtonSettingsChange = (value) => {
+    setButtonSettingsChange(value)
+  }
   return (
     <div className="bg-black/40 w-1/4 h-full  rounded-2xl backdrop-blur-sm flex flex-col justify-between items-center">
-      {isButtonClicked ? <AddButton handleCloseButton={handleCloseButton} /> : null}
-      <div className="flex w-11/12 h-10 text-white overflow-auto scrollbar-none">
-        <button key="Today" onClick={() => handleButtonClick('Today')}>
-          Today
-        </button>
-        {buttons.map((button) => {
-          return (
-            <button key={button.Name} onClick={() => handleButtonClick(button.Name)}>
-              {button.Name}
-            </button>
-          )
-        })}
-        <button onClick={addNewButton}>Kreiraj dugme</button>
+      {isButtonClicked ? (
+        <AddButton
+          handleCloseButton={handleCloseButton}
+          handleButtonChange={handleButtonChange}
+          handleButtonClick={handleButtonClick}
+          focus={focus}
+        />
+      ) : null}
+      {isButtonSettingClicked ? (
+        <ButtonSettings
+          handleCloseButtonSettings={handleCloseButtonSettings}
+          handleButtonSettingsChange={handleButtonSettingsChange}
+          handleButtonClick={handleButtonClick}
+          currentButton={currentButton}
+        />
+      ) : null}
+      <div className="flex items-center  justify-between w-11/12 h-20 text-white ">
+        <div
+          ref={containerRef}
+          onWheel={handleMouseWheel}
+          className=" flex w-9/12 overflow-x-auto scrollbar-none"
+        >
+          <button
+            key="Today"
+            onClick={() => handleButtonClick('Today')}
+            className={`p-1 mr-2 text-center  hover:text-white border-b-2   hover:border-white w-fit h-2/4 rounded-lg    transition duration-500 ease-in-out ${currentButton === 'Today' ? 'border-white text-white' : 'text-gray-400 border-gray-500'}`}
+          >
+            Today
+          </button>
+          {buttons.map((button) => {
+            return (
+              <button
+                key={button.Name}
+                onClick={() => handleButtonClick(button.Name)}
+                className={`p-1 mr-2 text-center  hover:text-white border-b-2   hover:border-white w-fit h-2/4 text-nowrap rounded-lg    transition duration-500 ease-in-out ${currentButton === button.Name ? 'border-white text-white' : 'text-gray-400 border-gray-500'} `}
+              >
+                {button.Name}
+              </button>
+            )
+          })}
+        </div>
+        <div className="flex ">
+          <button onClick={addNewButton}>
+            <GrChapterAdd className="flex justify-center items-center w-5 h-full  mr-2 text-gray-400 hover:text-white transition duration-500 ease-in-out" />
+          </button>
+          <button onClick={settingsButton}>
+            <IoMdSettings className="flex justify-center items-center w-5 pb-1 h-full text-gray-400 hover:text-white transition duration-500 ease-in-out" />
+          </button>
+        </div>
       </div>
-      <div className="flex w-11/12 h-10 bg-gray/30  backdrop-blur-sm hover:bg-black/25  transition duration-500 ease-in-out rounded-lg mt-5">
+      <div className="flex w-11/12 h-10 bg-gray/30  backdrop-blur-sm hover:bg-black/25  transition duration-500 ease-in-out rounded-lg ">
         <input
           type="text"
           placeholder="Add Task"
@@ -257,10 +317,10 @@ function ToDo(): JSX.Element {
                   </div>
                   <div className="flex  w-fit h-full">
                     <button onClick={() => handleUpdate(task)}>
-                      <AiFillEdit className="flex justify-center items-center mr-2 hover:text-gray-700 transition duration-500 ease-in-out" />
+                      <AiFillEdit className="flex justify-center items-center mr-2 text-gray-400 hover:text-white transition duration-500 ease-in-out" />
                     </button>
                     <button onClick={() => handleDelete(task._id)}>
-                      <AiFillDelete className="flex justify-center items-center hover:text-gray-700 transition duration-500 ease-in-out" />
+                      <AiFillDelete className="flex justify-center items-center text-gray-400 hover:text-white transition duration-500 ease-in-out" />
                     </button>
                   </div>
                 </motion.div>
@@ -317,10 +377,10 @@ function ToDo(): JSX.Element {
                     </div>
                     <div className="flex  w-fit h-full">
                       <button onClick={() => handleUpdate(task)}>
-                        <AiFillEdit className="flex justify-center text-gray-500 items-center mr-2 hover:text-gray-700 transition duration-500 ease-in-out" />
+                        <AiFillEdit className="flex justify-center text-gray-400 hover:text-white items-center mr-2  transition duration-500 ease-in-out" />
                       </button>
                       <button onClick={() => handleDelete(task._id)}>
-                        <AiFillDelete className="flex justify-center text-gray-500 items-center hover:text-gray-700 transition duration-500 ease-in-out" />
+                        <AiFillDelete className="flex justify-center text-gray-400 hover:text-white  items-center  transition duration-500 ease-in-out" />
                       </button>
                     </div>
                   </motion.div>

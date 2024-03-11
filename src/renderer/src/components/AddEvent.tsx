@@ -6,7 +6,6 @@ function AddEvent({ handleCloseEvent, date, handleEventSet, fromFirstValue, toFi
   const [titleValue, setTitleValue] = useState('')
   const [fromValue, setFromValue] = useState(fromFirstValue)
   const [toValue, setToValue] = useState(toFirstValue)
-  const [eventValue, setEventValue] = useState(true)
   const ref = useRef(null)
   const fromRef = useRef(null)
   const toRef = useRef(null)
@@ -40,7 +39,7 @@ function AddEvent({ handleCloseEvent, date, handleEventSet, fromFirstValue, toFi
       const data = await response.json()
       if (response.ok) {
         handleCloseEvent(false)
-        handleEventSet(eventValue)
+        handleEventSet(true)
         setTitleValue('')
         // window.location.reload()
       } else {

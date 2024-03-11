@@ -70,11 +70,77 @@ router.patch('/:id', getTodo, async (req, res) => {
   }
 })
 
+//update many
+router.patch('/', async (req, res) => {
+  let query = {} // Initialize an empty query object
+
+  // Provjeravamo da li je proslijeđen query parametar za pretragu po "Workspace"
+  if (req.query.workspace) {
+    // Ako jeste, kreiramo regex objekat za pretragu po "Workspace" polju
+    const workspaceRegex = new RegExp(req.query.workspace, 'i') // 'i' znači da je pretraga case-insensitive
+    query = { Workspace: workspaceRegex } // Postavljamo query da pretražuje "Workspace" polje
+  } else {
+    return res.status(400).json({ message: 'Query parameter "workspace" is required.' })
+  }
+
+  // Provjeravamo da li je poslana nova vrijednost za "Workspace"
+  if (!req.body.newWorkspace) {
+    return res
+      .status(400)
+      .json({ message: 'New value for "Workspace" is required in request body.' })
+  }
+
+  try {
+    // Update all documents that match the query
+    const updateResult = await Todo.updateMany(query, {
+      $set: { Workspace: req.body.newWorkspace }
+    })
+
+    if (updateResult.modifiedCount > 0) {
+      res
+        .status(200)
+        .json({ message: 'Successfully updated ' + updateResult.nModified + ' documents.' })
+    } else {
+      res.status(404).json({ message: 'No documents found matching the criteria.' })
+    }
+  } catch (err) {
+    res.status(500).json({ message: err.message })
+  }
+})
+
 //deleting one
 router.delete('/:id', getTodo, async (req, res) => {
   try {
     await res.todo.deleteOne()
     res.status(200).json({ message: 'Uspesno izbrisan' })
+  } catch (err) {
+    res.status(500).json({ message: err.message })
+  }
+})
+
+//delete all
+router.delete('/', async (req, res) => {
+  try {
+    let query = {} // Inicijalizujemo prazan query objekat
+
+    // Provjeravamo da li je proslijeđen query parametar za pretragu po "Workspace"
+    if (req.query.workspace) {
+      // Ako jeste, kreiramo regex objekat za pretragu po "Workspace" polju
+      const workspaceRegex = new RegExp(req.query.workspace, 'i') // 'i' znači da je pretraga case-insensitive
+      query = { Workspace: workspaceRegex } // Postavljamo query da pretražuje "Workspace" polje
+    }
+
+    // Izvršavamo upit na bazi podataka sa kreiranim query objektom
+    const todo = await Todo.deleteMany(query)
+      .then(function () {
+        // Success
+        console.log('Data deleted')
+      })
+      .catch(function (error) {
+        // Failure
+        console.log(error)
+      })
+    res.status(200).json({ message: 'Uspesno svi taskovi izbrisani' })
   } catch (err) {
     res.status(500).json({ message: err.message })
   }
