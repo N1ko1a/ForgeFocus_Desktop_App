@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { AiOutlineClose } from 'react-icons/ai'
+import { motion, AnimatePresence } from 'framer-motion'
 import '../main.css'
 
 function AddEvent({ handleCloseEvent, date, handleEventSet, fromFirstValue, toFirstValue }) {
@@ -73,7 +74,16 @@ function AddEvent({ handleCloseEvent, date, handleEventSet, fromFirstValue, toFi
       className=" fixed top-0 left-0  w-full h-full
                 flex items-center justify-center z-40 "
     >
-      <div className="bg-black/60  w-96 h-fit mb-10  mx-auto   text-black rounded-3xl backdrop-blur-sm ">
+      <motion.div
+        initial={{ opacity: 0, scale: 0.5 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{
+          duration: 0.4,
+          delay: 0.1,
+          ease: [0, 0.71, 0.2, 1.01]
+        }}
+        className="bg-black/60  w-96 h-fit mb-10  mx-auto   text-black rounded-3xl backdrop-blur-sm "
+      >
         <div className="w-full h-5 mr-10 relative mb-5 ">
           <AiOutlineClose
             className="w-5 h-5 absolute text-gray-500 hover:text-white top-8 right-5   transition duration-500 ease-in-out cursor-pointer"
@@ -120,7 +130,7 @@ function AddEvent({ handleCloseEvent, date, handleEventSet, fromFirstValue, toFi
             Add Event
           </button>
         </div>
-      </div>
+      </motion.div>
     </div>
   )
 }

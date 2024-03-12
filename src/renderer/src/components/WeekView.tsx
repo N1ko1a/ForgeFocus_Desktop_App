@@ -12,6 +12,7 @@ import {
 import { useState, useEffect } from 'react'
 import AddEvent from './AddEvent'
 import EventOptions from './EventOptions'
+import { motion, AnimatePresence } from 'framer-motion'
 
 interface Event {
   date: Date
@@ -71,14 +72,17 @@ function WeekView({ current }) {
     setIsEventChange(false)
   }, [isEventSet, isEventChange])
 
-  const handleClick = (date) => {
+  const handleClick = (date, hour) => {
     setIsClicked(true)
+    console.log(date)
     setDate(date)
-    const hours = date.getHours().toString().padStart(2, '0')
-    const hoursto = (date.getHours() + 1).toString().padStart(2, '0')
-    const minutes = date.getMinutes().toString().padStart(2, '0')
+    const hours = hour.getHours().toString().padStart(2, '0')
+    const hoursto = (hour.getHours() + 1).toString().padStart(2, '0')
+    const minutes = hour.getMinutes().toString().padStart(2, '0')
     const timestamp = `${hours}:${minutes}`
     const timestampto = `${hoursto}:${minutes}`
+    console.log(timestamp)
+    console.log(timestampto)
     setFromFirstValue(timestamp)
     setToFirstValue(timestampto)
   }
@@ -160,32 +164,42 @@ function WeekView({ current }) {
                 return (
                   <div
                     key={index}
-                    onClick={() => handleClick(day)}
+                    onClick={() => handleClick(day, hour)}
                     className="overflow-auto scrollbar-none text-center border-2 border-black text-gray-300 p-2 mb-2 h-20 rounded-md text-strat bg-gray/30  backdrop-blur-sm hover:bg-black/25  transition duration-500 ease-in-out"
                   >
-                    {events
-                      .filter(
-                        (event) =>
-                          isSameDay(event.Date, day) &&
-                          timestamp >= event.FromDate &&
-                          timestamp <= event.ToDate
-                      )
-                      .map((event) => {
-                        const handleEventClickWithArgs = (e) => {
-                          e.stopPropagation()
-                          handleEventClick(event.FromDate, event.ToDate, event._id, event.Title)
-                        }
-
-                        return (
-                          <div
-                            key={event.Title}
-                            onClick={handleEventClickWithArgs}
-                            className=" hover:cursor-pointer mb-1 pl-1 bg-gray-700 rounded-md text-sm truncate"
-                          >
-                            {event.Title}
-                          </div>
+                    <AnimatePresence>
+                      {events
+                        .filter(
+                          (event) =>
+                            isSameDay(event.Date, day) &&
+                            timestamp > event.FromDate &&
+                            timestamp <= event.ToDate
                         )
-                      })}
+                        .map((event) => {
+                          const handleEventClickWithArgs = (e) => {
+                            e.stopPropagation()
+                            handleEventClick(event.FromDate, event.ToDate, event._id, event.Title)
+                          }
+
+                          return (
+                            <motion.div
+                              initial={{ opacity: 0, scale: 0.5 }}
+                              animate={{ opacity: 1, scale: 1 }}
+                              exit={{ opacity: 0, y: -10 }}
+                              transition={{
+                                duration: 0.4,
+                                delay: 0.1,
+                                ease: [0, 0.71, 0.2, 1.01]
+                              }}
+                              key={event.Title}
+                              onClick={handleEventClickWithArgs}
+                              className=" hover:cursor-pointer mb-1 pl-1 bg-gray-700 rounded-md text-sm truncate"
+                            >
+                              {event.Title}
+                            </motion.div>
+                          )
+                        })}
+                    </AnimatePresence>
                   </div>
                 )
               })}

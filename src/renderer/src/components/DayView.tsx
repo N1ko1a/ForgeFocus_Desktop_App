@@ -10,6 +10,7 @@ import {
 import { useState, useEffect } from 'react'
 import AddEvent from './AddEvent'
 import EventOptions from './EventOptions'
+import { motion, AnimatePresence } from 'framer-motion'
 
 interface Event {
   date: Date
@@ -124,29 +125,39 @@ function DayView({ current }) {
             onClick={() => handleClick(hour)}
           >
             {format(hour, 'h a')}
-            {events
-              .filter(
-                (event) =>
-                  isSameDay(event.Date, hour) &&
-                  timestamp >= event.FromDate &&
-                  timestamp <= event.ToDate
-              )
-              .map((event) => {
-                const handleEventClickWithArgs = (e) => {
-                  e.stopPropagation()
-                  handleEventClick(event.FromDate, event.ToDate, event._id, event.Title)
-                }
-
-                return (
-                  <div
-                    key={event.Title}
-                    onClick={handleEventClickWithArgs}
-                    className=" hover:cursor-pointer bg-gray-700  p-1 mb-1 rounded-md  "
-                  >
-                    {event.Title}
-                  </div>
+            <AnimatePresence>
+              {events
+                .filter(
+                  (event) =>
+                    isSameDay(event.Date, hour) &&
+                    timestamp > event.FromDate &&
+                    timestamp <= event.ToDate
                 )
-              })}
+                .map((event) => {
+                  const handleEventClickWithArgs = (e) => {
+                    e.stopPropagation()
+                    handleEventClick(event.FromDate, event.ToDate, event._id, event.Title)
+                  }
+
+                  return (
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.5 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      transition={{
+                        duration: 0.4,
+                        delay: 0.1,
+                        ease: [0, 0.71, 0.2, 1.01]
+                      }}
+                      key={event.Title}
+                      onClick={handleEventClickWithArgs}
+                      className=" hover:cursor-pointer bg-gray-700  p-1 mb-1 rounded-md  "
+                    >
+                      {event.Title}
+                    </motion.div>
+                  )
+                })}
+            </AnimatePresence>
           </div>
         )
       })}

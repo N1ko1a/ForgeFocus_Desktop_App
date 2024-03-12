@@ -11,6 +11,7 @@ import {
 import { useEffect, useState } from 'react'
 import AddEvent from './AddEvent'
 import EventOptions from './EventOptions'
+import { motion, AnimatePresence } from 'framer-motion'
 // import AddEvent from './AddEvent'
 
 interface Event {
@@ -157,71 +158,81 @@ function MonthView({ current }): JSX.Element {
           >
             {format(day, 'd')}
             <div className="flex flex-col  items-center">
-              {events
-                .filter((event) => isSameDay(event.Date, day))
-                .map((event) => {
-                  // Function to handle event click with arguments
-                  const handleEventClickWithArgs = (e) => {
-                    e.stopPropagation()
-                    handleEventClick(event.FromDate, event.ToDate, event._id, event.Title)
-                  }
+              <AnimatePresence>
+                {events
+                  .filter((event) => isSameDay(event.Date, day))
+                  .map((event) => {
+                    // Function to handle event click with arguments
+                    const handleEventClickWithArgs = (e) => {
+                      e.stopPropagation()
+                      handleEventClick(event.FromDate, event.ToDate, event._id, event.Title)
+                    }
 
-                  // Function to handle notification click
-                  const handleNotificationClick = (Naslov) => {
-                    // Calling your test function to show notification
-                    Notification.requestPermission().then((perm) => {
-                      if (perm === 'granted') {
-                        // Ovde možete koristiti ovu notifikaciju ili promeniti po potrebi
-                        new Notification(`${Naslov}`, {
-                          body: `${event.Title}`
-                        })
-                      }
-                    })
-                  }
-                  const [hours, minutes] = event.FromDate.split(':')
-                  const eventTime = new Date()
-                  eventTime.setHours(parseInt(hours))
-                  eventTime.setMinutes(parseInt(minutes))
+                    // Function to handle notification click
+                    const handleNotificationClick = (Naslov) => {
+                      // Calling your test function to show notification
+                      Notification.requestPermission().then((perm) => {
+                        if (perm === 'granted') {
+                          // Ovde možete koristiti ovu notifikaciju ili promeniti po potrebi
+                          new Notification(`${Naslov}`, {
+                            body: `${event.Title}`
+                          })
+                        }
+                      })
+                    }
+                    const [hours, minutes] = event.FromDate.split(':')
+                    const eventTime = new Date()
+                    eventTime.setHours(parseInt(hours))
+                    eventTime.setMinutes(parseInt(minutes))
 
-                  // Proveravamo da li je datum događaja danas
-                  const currentDate = new Date()
-                  const eventDate = new Date(event.Date)
-                  const isSameDay =
-                    eventDate.getDate() === currentDate.getDate() &&
-                    eventDate.getMonth() === currentDate.getMonth() &&
-                    eventDate.getFullYear() === currentDate.getFullYear()
-                  // Dodajemo 30 minuta na vreme događaja za notifikaciju
-                  const notificationTime = new Date(eventTime.getTime() - 30 * 60000)
+                    // Proveravamo da li je datum događaja danas
+                    const currentDate = new Date()
+                    const eventDate = new Date(event.Date)
+                    const isSameDay =
+                      eventDate.getDate() === currentDate.getDate() &&
+                      eventDate.getMonth() === currentDate.getMonth() &&
+                      eventDate.getFullYear() === currentDate.getFullYear()
+                    // Dodajemo 30 minuta na vreme događaja za notifikaciju
+                    const notificationTime = new Date(eventTime.getTime() - 30 * 60000)
 
-                  // Trenutno vreme
-                  const currentTime = new Date()
+                    // Trenutno vreme
+                    const currentTime = new Date()
 
-                  // Proveravamo vreme za prikaz notifikacije
-                  if (isSameDay && notificationTime > currentTime) {
-                    setTimeout(() => {
-                      const Naslov = 'Event starts in 30 minuts'
-                      handleNotificationClick(Naslov)
-                    }, notificationTime - currentTime)
-                  }
+                    // Proveravamo vreme za prikaz notifikacije
+                    if (isSameDay && notificationTime > currentTime) {
+                      setTimeout(() => {
+                        const Naslov = 'Event starts in 30 minuts'
+                        handleNotificationClick(Naslov)
+                      }, notificationTime - currentTime)
+                    }
 
-                  // Dodajemo notifikaciju ako je događaj u budućnosti
-                  const timeUntilEventStart = eventTime - currentTime
-                  if (isSameDay && timeUntilEventStart > 0) {
-                    setTimeout(() => {
-                      const Naslov = 'Event started'
-                      handleNotificationClick(Naslov)
-                    }, timeUntilEventStart)
-                  }
-                  return (
-                    <div
-                      key={event.Title}
-                      className=" w-11/12 h-fit mb-1 bg-gray-700 rounded-md text-sm truncate hover:cursor-pointer"
-                      onClick={handleEventClickWithArgs}
-                    >
-                      {event.Title}
-                    </div>
-                  )
-                })}
+                    // Dodajemo notifikaciju ako je događaj u budućnosti
+                    const timeUntilEventStart = eventTime - currentTime
+                    if (isSameDay && timeUntilEventStart > 0) {
+                      setTimeout(() => {
+                        const Naslov = 'Event started'
+                        handleNotificationClick(Naslov)
+                      }, timeUntilEventStart)
+                    }
+                    return (
+                      <motion.div
+                        initial={{ opacity: 0, scale: 0.5 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, y: -10 }}
+                        transition={{
+                          duration: 0.4,
+                          delay: 0.1,
+                          ease: [0, 0.71, 0.2, 1.01]
+                        }}
+                        key={event.Title}
+                        className=" w-11/12 h-fit mb-1 bg-gray-700 rounded-md text-sm truncate hover:cursor-pointer"
+                        onClick={handleEventClickWithArgs}
+                      >
+                        {event.Title}
+                      </motion.div>
+                    )
+                  })}
+              </AnimatePresence>
             </div>
           </div>
         )
