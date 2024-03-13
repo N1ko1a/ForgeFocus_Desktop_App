@@ -1,21 +1,33 @@
 import React, { useState, useEffect, useRef } from 'react'
-import { FaPlay, FaPause } from 'react-icons/fa'
-import { VscDebugRestart } from 'react-icons/vsc'
+const Timer = ({
+  initialHours,
+  initialMinutes,
+  initialSeconds,
+  isActive,
+  isWorkButtonClicked,
+  handleIsActive,
+  handleIsWorkButtonClicked,
+  handleIsRestButtonClicked
+}) => {
+  const [hours, setHours] = useState(
+    isWorkButtonClicked
+      ? window.localStorage.getItem('Work Hours') || initialHours
+      : window.localStorage.getItem('Rest Hours') || initialHours
+  )
+  const [minutes, setMinutes] = useState(
+    isWorkButtonClicked
+      ? window.localStorage.getItem('Work Minutes') || initialMinutes
+      : window.localStorage.getItem('Rest Minutes') || initialMinutes
+  )
+  const [seconds, setSeconds] = useState(
+    isWorkButtonClicked
+      ? window.localStorage.getItem('Work Seconds') || initialSeconds
+      : window.localStorage.getItem('Rest Seconds') || initialSeconds
+  )
 
-const Timer = () => {
-  const storedHours = parseInt(window.localStorage.getItem('Hours'))
-  const storedMinutes = parseInt(window.localStorage.getItem('Minutes'))
-  const storedSeconds = parseInt(window.localStorage.getItem('Seconds'))
-
-  const [hours, setHours] = useState(!isNaN(storedHours) ? storedHours : 0)
-  const [minutes, setMinutes] = useState(!isNaN(storedMinutes) ? storedMinutes : 45)
-  const [seconds, setSeconds] = useState(!isNaN(storedSeconds) ? storedSeconds : 0)
-  const [isActive, setIsActive] = useState(false)
   const [hourIsClicked, setHourIsClicked] = useState(false)
   const [minutesIsClicked, setMinutesIsClicked] = useState(false)
   const [secondsIsClicked, setSecondsIsClicked] = useState(false)
-  const [isWorkButtonClicked, setIsWorkButtonClicked] = useState(false)
-  const [isRestButtonClicked, setIsRestButtonClicked] = useState(false)
   const hourRef = useRef(null)
   const minutesRef = useRef(null)
   const secondsRef = useRef(null)
@@ -36,23 +48,62 @@ const Timer = () => {
           setSeconds(59)
         }
       }, 1000)
-    } else if (hours === 0 && minutes === 0 && seconds === 0) {
-      setIsActive(false)
+    } else if (hours == 0 && minutes == 0 && seconds == 0) {
+      setHours(
+        isWorkButtonClicked
+          ? window.localStorage.getItem('Work Hours') || initialHours
+          : window.localStorage.getItem('Rest Hours') || initialHours
+      )
+      setMinutes(
+        isWorkButtonClicked
+          ? window.localStorage.getItem('Work Minutes') || initialMinutes
+          : window.localStorage.getItem('Rest Minutes') || initialMinutes
+      )
+      setSeconds(
+        isWorkButtonClicked
+          ? window.localStorage.getItem('Work Seconds') || initialSeconds
+          : window.localStorage.getItem('Rest Seconds') || initialSeconds
+      )
+      if (isWorkButtonClicked) {
+        let test = window.localStorage.getItem('Count')
+        if (test >= 3) {
+          window.localStorage.setItem('Count', 0)
+          handleIsWorkButtonClicked(true)
+          handleIsActive(false)
+          Notification.requestPermission().then((perm) => {
+            if (perm === 'granted') {
+              new Notification('Pomodora Timer', {
+                body: 'Full session completed!'
+              })
+            }
+          })
+        } else {
+          window.localStorage.setItem('Count', parseInt(test) + 1)
+          handleIsWorkButtonClicked(false)
+          handleIsActive(true)
+          Notification.requestPermission().then((perm) => {
+            if (perm === 'granted') {
+              new Notification('Pomodora Timer', {
+                body: `Work session ${window.localStorage.getItem('Count')} compleated!`
+              })
+            }
+          })
+        }
+      } else {
+        handleIsRestButtonClicked(false)
+        handleIsActive(true)
+        Notification.requestPermission().then((perm) => {
+          if (perm === 'granted') {
+            new Notification('Pomodora Timer', {
+              body: 'Rest session compleated!'
+            })
+          }
+        })
+      }
     }
 
     return () => clearInterval(intervalId)
-  }, [isActive, hours, minutes, seconds])
-
-  const toggleTimer = () => {
-    setIsActive((prevIsActive) => !prevIsActive)
-  }
-
-  const resetTimer = () => {
-    setIsActive(false)
-    setHours(initialHours)
-    setMinutes(initialMinutes)
-    setSeconds(initialSeconds)
-  }
+  }, [isActive, isWorkButtonClicked, hours, minutes, seconds])
 
   const handleHourClick = () => {
     setHourIsClicked(true)
@@ -68,7 +119,7 @@ const Timer = () => {
 
   const handleHoursUpdate = (event) => {
     const newHours = event.target.value
-    window.localStorage.setItem('Hours', newHours)
+    window.localStorage.setItem(isWorkButtonClicked ? 'Work Hours' : 'Rest Hours', newHours)
     setHours(newHours)
   }
 
@@ -76,18 +127,16 @@ const Timer = () => {
     let newMinutes = event.target.value
     newMinutes = newMinutes.slice(0, 2)
     if (newMinutes >= 0 && newMinutes <= 59) {
-      window.localStorage.setItem('Minutes', newMinutes)
+      window.localStorage.setItem(isWorkButtonClicked ? 'Work Minutes' : 'Rest Minutes', newMinutes)
       setMinutes(newMinutes)
     }
   }
 
   const handleSecondsUpdate = (event) => {
     let newSeconds = event.target.value
-    // Ograničavamo dužinu na dve cifre
     newSeconds = newSeconds.slice(0, 2)
-    // Ako je unutar opsega 0-59, čuvamo vrednost i ažuriramo lokalno skladište
     if (newSeconds >= 0 && newSeconds <= 59) {
-      window.localStorage.setItem('Seconds', newSeconds)
+      window.localStorage.setItem(isWorkButtonClicked ? 'Work Seconds' : 'Rest Seconds', newSeconds)
       setSeconds(newSeconds)
     }
   }
@@ -122,104 +171,64 @@ const Timer = () => {
     }
   }, [hourIsClicked, minutesIsClicked, secondsIsClicked])
 
-  const handleWorkButton = () => {
-    setIsWorkButtonClicked(true)
-    setIsRestButtonClicked(false)
-  }
-  const handleRestButton = () => {
-    setIsRestButtonClicked(true)
-    setIsWorkButtonClicked(false)
-  }
-
   return (
-    <div className="flex flex-col gap-2 w-fit p-5 h-5/6 justify-center items-center bg-black/40 rounded-2xl backdrop-blur-sm ">
-      <div className="flex justify-center w-full h-full pt-2 pb-2 text-gray-300/80 font-bold">
-        {hourIsClicked ? (
-          <input
-            ref={hourRef}
-            type="number"
-            value={hours}
-            onChange={handleHoursUpdate}
-            onKeyDown={handleKeyDownUpdate}
-            onBlur={() => setHourIsClicked(false)}
-            className="w-24 h-16 md:w-36 md:h-24 lg:w-44 lg:h-32 bg-transparent text-7xl md:text-8xl lg:text-9xl text-white  outline-none"
-          />
-        ) : (
-          <h1
-            onClick={handleHourClick}
-            className="w-24 h-16 md:w-36 md:h-24 lg:w-44 lg:h-32  text-7xl md:text-8xl lg:text-9xl"
-          >
-            {hours < 10 ? '0' + hours : hours}
-          </h1>
-        )}
-        <h1 className="text-7xl md:text-8xl lg:text-9xl">:</h1>
-        {minutesIsClicked ? (
-          <input
-            ref={minutesRef}
-            type="number"
-            value={minutes}
-            onChange={handleMinutesUpdate}
-            onKeyDown={handleKeyDownUpdate}
-            onBlur={() => setMinutesIsClicked(false)}
-            className="w-24 h-16 md:w-36 md:h-24 lg:w-44 lg:h-32  bg-transparent  text-7xl md:text-8xl lg:text-9xl text-white  outline-none"
-          />
-        ) : (
-          <h1
-            onClick={handleMinutesClick}
-            className="w-24 h-16 md:w-36 md:h-24 lg:w-44 lg:h-32  text-7xl md:text-8xl lg:text-9xl"
-          >
-            {minutes < 10 && minutes.length < 2 ? '0' + minutes : minutes}
-          </h1>
-        )}
-        <h1 className="text-7xl md:text-8xl lg:text-9xl">:</h1>
-        {secondsIsClicked ? (
-          <input
-            ref={secondsRef}
-            type="number"
-            value={seconds}
-            onChange={handleSecondsUpdate}
-            onKeyDown={handleKeyDownUpdate}
-            onBlur={() => setSecondsIsClicked(false)}
-            className="w-24 h-16 md:w-36 md:h-24 lg:w-44 lg:h-32 bg-transparent text-7xl md:text-8xl lg:text-9xl  text-white  outline-none"
-          />
-        ) : (
-          <h1
-            onClick={handleSecondsClick}
-            className="w-24 h-16 md:w-36 md:h-24 lg:w-44 lg:h-32  text-7xl md:text-8xl lg:text-9xl"
-          >
-            {seconds < 10 && seconds.length < 2 ? '0' + seconds : seconds}
-          </h1>
-        )}
-      </div>
-      <div className="flex w-full h-full justify-between">
-        <button
-          className={`w-20 md:w-24 lg:w-36 h-10 md: text-sm lg:text-base font-bold mb-5 border-b-2   hover:border-white text-center rounded-xl bg-transparent outline-none    transition duration-500 ease-in-out hover:text-white ${isWorkButtonClicked ? 'text-white border-white' : 'text-gray-400 border-gray-400'}`}
-          onClick={handleWorkButton}
+    <div className="flex justify-center w-full h-full pt-2 pb-2 text-gray-300/80 font-bold">
+      {hourIsClicked ? (
+        <input
+          ref={hourRef}
+          type="number"
+          value={hours}
+          onChange={handleHoursUpdate}
+          onKeyDown={handleKeyDownUpdate}
+          onBlur={() => setHourIsClicked(false)}
+          className="w-24 h-16 md:w-36 md:h-24 lg:w-44 lg:h-32 bg-transparent text-7xl md:text-8xl lg:text-9xl text-white  outline-none"
+        />
+      ) : (
+        <h1
+          onClick={handleHourClick}
+          className="w-24 h-16 md:w-36 md:h-24 lg:w-44 lg:h-32  text-7xl md:text-8xl lg:text-9xl"
         >
-          Work
-        </button>
-
-        <div className="flex h-full text-gray-300/80 pb-5">
-          <button
-            onClick={toggleTimer}
-            className="text-2xl md:text-3xl lg:text-4xl mr-10 hover:text-white transition duration-500 ease-in-out"
-          >
-            {isActive ? <FaPause /> : <FaPlay />}
-          </button>
-          <button
-            onClick={resetTimer}
-            className="text-2xl md:text-3xl lg:text-4xl  hover:text-white transition duration-500 ease-in-out"
-          >
-            <VscDebugRestart />
-          </button>
-        </div>
-        <button
-          className={`w-20 md:w-24 lg:w-36 h-10 md: text-sm lg:text-base font-bold mb-5 border-b-2   hover:border-white text-center rounded-xl bg-transparent outline-none    transition duration-500 ease-in-out hover:text-white ${isRestButtonClicked ? 'text-white border-white' : 'text-gray-400 border-gray-400'}`}
-          onClick={handleRestButton}
+          {hours < 10 ? '0' + hours : hours}
+        </h1>
+      )}
+      <h1 className="text-7xl md:text-8xl lg:text-9xl">:</h1>
+      {minutesIsClicked ? (
+        <input
+          ref={minutesRef}
+          type="number"
+          value={minutes}
+          onChange={handleMinutesUpdate}
+          onKeyDown={handleKeyDownUpdate}
+          onBlur={() => setMinutesIsClicked(false)}
+          className="w-24 h-16 md:w-36 md:h-24 lg:w-44 lg:h-32  bg-transparent  text-7xl md:text-8xl lg:text-9xl text-white  outline-none"
+        />
+      ) : (
+        <h1
+          onClick={handleMinutesClick}
+          className="w-24 h-16 md:w-36 md:h-24 lg:w-44 lg:h-32  text-7xl md:text-8xl lg:text-9xl"
         >
-          Brake
-        </button>
-      </div>
+          {minutes < 10 && minutes.length < 2 ? '0' + minutes : minutes}
+        </h1>
+      )}
+      <h1 className="text-7xl md:text-8xl lg:text-9xl">:</h1>
+      {secondsIsClicked ? (
+        <input
+          ref={secondsRef}
+          type="number"
+          value={seconds}
+          onChange={handleSecondsUpdate}
+          onKeyDown={handleKeyDownUpdate}
+          onBlur={() => setSecondsIsClicked(false)}
+          className="w-24 h-16 md:w-36 md:h-24 lg:w-44 lg:h-32 bg-transparent text-7xl md:text-8xl lg:text-9xl  text-white  outline-none"
+        />
+      ) : (
+        <h1
+          onClick={handleSecondsClick}
+          className="w-24 h-16 md:w-36 md:h-24 lg:w-44 lg:h-32  text-7xl md:text-8xl lg:text-9xl"
+        >
+          {seconds < 10 && seconds.length < 2 ? '0' + seconds : seconds}
+        </h1>
+      )}
     </div>
   )
 }
