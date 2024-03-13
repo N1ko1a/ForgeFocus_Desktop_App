@@ -7,7 +7,6 @@ function AddEvent({ handleCloseEvent, date, handleEventSet, fromFirstValue, toFi
   const [titleValue, setTitleValue] = useState('')
   const [fromValue, setFromValue] = useState(fromFirstValue)
   const [toValue, setToValue] = useState(toFirstValue)
-  console.log(toFirstValue)
   const ref = useRef(null)
   const fromRef = useRef(null)
   const toRef = useRef(null)

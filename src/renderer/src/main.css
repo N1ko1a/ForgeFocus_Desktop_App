@@ -13,3 +13,9 @@ input[type='time']::-webkit-datetime-edit-ampm-field:focus {
   background-color: #6b7280;
   border-radius: 5px;
 }
+input[type='number']::-webkit-inner-spin-button,
+input[type='number']::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  appearance: none;
+  margin: 0;
+}
