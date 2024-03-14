@@ -25,7 +25,7 @@ function AddEvent({ handleCloseEvent, date, handleEventSet, fromFirstValue, toFi
   }
   const handleSubmit = async () => {
     try {
-      const response = await fetch('http://localhost:3000/event', {
+      const response = await fetch('http://localhost:3030/event', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

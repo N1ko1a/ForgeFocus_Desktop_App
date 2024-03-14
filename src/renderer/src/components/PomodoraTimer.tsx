@@ -43,9 +43,9 @@ const PomodoraTimer = () => {
     <div className="flex flex-col gap-2 w-fit p-5 h-5/6 justify-center items-center bg-black/40 rounded-2xl backdrop-blur-sm ">
       {isWorkButtonClicked ? (
         <Timer
-          initialHours={0}
-          initialMinutes={45}
-          initialSeconds={0}
+          initialHours={'0'}
+          initialMinutes={'45'}
+          initialSeconds={'0'}
           handleIsActive={handleIsActive}
           isActive={isActive}
           isWorkButtonClicked={isWorkButtonClicked}
@@ -57,9 +57,9 @@ const PomodoraTimer = () => {
       ) : null}
       {isRestButtonClicked ? (
         <Timer
-          initialHours={0}
-          initialMinutes={15}
-          initialSeconds={0}
+          initialHours={'0'}
+          initialMinutes={'15'}
+          initialSeconds={'0'}
           handleIsActive={handleIsActive}
           isActive={isActive}
           isWorkButtonClicked={isWorkButtonClicked}

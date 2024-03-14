@@ -54,7 +54,7 @@ function WeekView({ current }) {
   useEffect(() => {
     setIsLoading(true)
 
-    const apiURL = `http://localhost:3000/event`
+    const apiURL = `http://localhost:3030/event`
 
     fetch(apiURL)
       .then((res) => res.json())

@@ -1,20 +1,22 @@
 import { app, shell, BrowserWindow, ipcMain } from 'electron'
 import { join } from 'path'
+import { spawn } from 'child_process'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
-import icon from '../../resources/icon.png?asset'
+import icon1 from '../renderer/src/assets/slika6.png?asset'
 
 function createWindow(): void {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
-    width: 900,
-    height: 670,
+    width: 1400,
+    height: 1200,
     show: false,
     autoHideMenuBar: true,
-    ...(process.platform === 'linux' ? { icon } : {}),
+    icon: icon1,
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
       sandbox: false
-    }
+    },
+    fullscreen: false
   })
 
   mainWindow.on('ready-to-show', () => {
@@ -38,6 +40,7 @@ function createWindow(): void {
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
+let serverProcess
 app.whenReady().then(() => {
   // Set app user model id for windows
   electronApp.setAppUserModelId('com.electron')
@@ -54,6 +57,12 @@ app.whenReady().then(() => {
 
   createWindow()
 
+  // Pokreni server node server.js
+  serverProcess = spawn(
+    'node',
+    ['/home/nikola/Nikola/github/Productivity_Desktop_App/api/server.js'],
+    { stdio: 'inherit' }
+  )
   app.on('activate', function () {
     // On macOS it's common to re-create a window in the app when the
     // dock icon is clicked and there are no other windows open.
@@ -65,6 +74,9 @@ app.whenReady().then(() => {
 // for applications and their menu bar to stay active until the user quits
 // explicitly with Cmd + Q.
 app.on('window-all-closed', () => {
+  if (serverProcess) {
+    serverProcess.kill('SIGINT') // Ubij proces servera koristeći SIGINT signal
+  }
   if (process.platform !== 'darwin') {
     app.quit()
   }

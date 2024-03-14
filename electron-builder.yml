@@ -13,6 +13,7 @@ asarUnpack:
   - resources/**
 win:
   executableName: productivity-desktop-app
+  icon: build/icon.ico # Path to your Windows icon file
 nsis:
   artifactName: ${name}-${version}-setup.${ext}
   shortcutName: ${productName}
@@ -26,8 +27,9 @@ mac:
     - NSDocumentsFolderUsageDescription: Application requests access to the user's Documents folder.
     - NSDownloadsFolderUsageDescription: Application requests access to the user's Downloads folder.
   notarize: false
+  icon: build/icon.icns # Path to your macOS icon file
 dmg:
-  artifactName: ${name}-${version}.${ext}
+  artifactName: ${name}.${ext}
 linux:
   target:
     - AppImage
@@ -35,8 +37,9 @@ linux:
     - deb
   maintainer: electronjs.org
   category: Utility
+  icon: build/icon.png # Path to your Linux icon file
 appImage:
-  artifactName: ${name}-${version}.${ext}
+  artifactName: ${name}.${ext}
 npmRebuild: false
 publish:
   provider: generic

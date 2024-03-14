@@ -26,7 +26,7 @@ function ButtonSettings({
   //Uzimam buttons iz baze
   useEffect(() => {
     setIsLoading(true)
-    const apiURL = `http://localhost:3000/buttons`
+    const apiURL = `http://localhost:3030/buttons`
     fetch(apiURL)
       .then((res) => res.json())
       .then((data) => {
@@ -47,7 +47,7 @@ function ButtonSettings({
   const handleKeyDownUpdate = async (event, button) => {
     if (event.key === 'Enter') {
       try {
-        const response = await fetch(`http://localhost:3000/buttons/${button._id}`, {
+        const response = await fetch(`http://localhost:3030/buttons/${button._id}`, {
           method: 'PATCH',
           headers: {
             'Content-Type': 'application/json'
@@ -64,7 +64,7 @@ function ButtonSettings({
           handleButtonClick(nameValue)
           handleButtonSettingsChange(true)
           setButtonChange(true)
-          const response = await fetch(`http://localhost:3000/todo?workspace=${button.Name}`, {
+          const response = await fetch(`http://localhost:3030/todo?workspace=${button.Name}`, {
             method: 'PATCH',
             headers: {
               'Content-Type': 'application/json'
@@ -83,7 +83,7 @@ function ButtonSettings({
   //Delete
   const handleDelete = async (button) => {
     try {
-      const response = await fetch(`http://localhost:3000/buttons/${button._id}`, {
+      const response = await fetch(`http://localhost:3030/buttons/${button._id}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json'
@@ -95,7 +95,7 @@ function ButtonSettings({
       if (response.ok) {
         console.log(data.message)
 
-        const anotherResponse = await fetch(`http://localhost:3000/todo?workspace=${button.Name}`, {
+        const anotherResponse = await fetch(`http://localhost:3030/todo?workspace=${button.Name}`, {
           method: 'DELETE',
           headers: {
             'Content-Type': 'application/json'

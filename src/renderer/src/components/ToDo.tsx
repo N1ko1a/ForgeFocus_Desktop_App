@@ -43,7 +43,7 @@ function ToDo(): JSX.Element {
 
   useEffect(() => {
     setIsLoading(true)
-    const apiURL = `http://localhost:3000/buttons`
+    const apiURL = `http://localhost:3030/buttons`
     fetch(apiURL)
       .then((res) => res.json())
       .then((data) => {
@@ -61,7 +61,7 @@ function ToDo(): JSX.Element {
 
   useEffect(() => {
     setIsLoading(true)
-    const apiURL = `http://localhost:3000/todo?workspace=${currentButton}`
+    const apiURL = `http://localhost:3030/todo?workspace=${currentButton}`
     fetch(apiURL)
       .then((res) => res.json())
       .then((data) => {
@@ -101,7 +101,7 @@ function ToDo(): JSX.Element {
 
   const handleCheckBoxChange = async (e, taskId) => {
     try {
-      const response = await fetch(`http://localhost:3000/todo/${taskId}`, {
+      const response = await fetch(`http://localhost:3030/todo/${taskId}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json'
@@ -125,7 +125,7 @@ function ToDo(): JSX.Element {
   const handleKeyDown = async (event) => {
     if (event.key === 'Enter') {
       try {
-        const response = await fetch('http://localhost:3000/todo', {
+        const response = await fetch('http://localhost:3030/todo', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
@@ -150,7 +150,7 @@ function ToDo(): JSX.Element {
   const handleKeyDownUpdate = async (event, taskId) => {
     if (event.key === 'Enter') {
       try {
-        const response = await fetch(`http://localhost:3000/todo/${taskId}`, {
+        const response = await fetch(`http://localhost:3030/todo/${taskId}`, {
           method: 'PATCH',
           headers: {
             'Content-Type': 'application/json'
@@ -173,7 +173,7 @@ function ToDo(): JSX.Element {
   }
   const handleDelete = async (index) => {
     try {
-      const response = await fetch(`http://localhost:3000/todo/${index}`, {
+      const response = await fetch(`http://localhost:3030/todo/${index}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json'

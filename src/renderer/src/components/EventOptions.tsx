@@ -34,7 +34,7 @@ function EventOptions({
   }
   const handleEdit = async () => {
     try {
-      const response = await fetch(`http://localhost:3000/event/${eventId}`, {
+      const response = await fetch(`http://localhost:3030/event/${eventId}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json'
@@ -60,7 +60,7 @@ function EventOptions({
   }
   const handleDelete = async () => {
     try {
-      const response = await fetch(`http://localhost:3000/event/${eventId}`, {
+      const response = await fetch(`http://localhost:3030/event/${eventId}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json'
