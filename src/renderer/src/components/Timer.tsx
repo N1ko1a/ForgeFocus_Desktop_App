@@ -7,8 +7,11 @@ const Timer = ({
   isWorkButtonClicked,
   handleIsActive,
   handleIsWorkButtonClicked,
-  handleIsRestButtonClicked
+  handleIsRestButtonClicked,
+  handleIsResetClicked,
+  isResetClicked
 }) => {
+  console.log(isResetClicked)
   const [hours, setHours] = useState(
     isWorkButtonClicked
       ? window.localStorage.getItem('Work Hours') || initialHours
@@ -34,6 +37,21 @@ const Timer = ({
 
   useEffect(() => {
     let intervalId
+    if (isResetClicked) {
+      if (isWorkButtonClicked) {
+        setHours(window.localStorage.getItem('Work Hours') || initialHours)
+        setMinutes(window.localStorage.getItem('Work Minutes') || initialMinutes)
+        setSeconds(window.localStorage.getItem('Work Seconds') || initialSeconds)
+        handleIsActive(false)
+        handleIsResetClicked(false)
+      } else {
+        setHours(window.localStorage.getItem('Rest Hours') || initialHours)
+        setMinutes(window.localStorage.getItem('Rest Minutes') || initialMinutes)
+        setSeconds(window.localStorage.getItem('Rest Seconds') || initialSeconds)
+        handleIsActive(false)
+        handleIsResetClicked(false)
+      }
+    }
 
     if (isActive && (hours > 0 || minutes > 0 || seconds > 0)) {
       intervalId = setInterval(() => {
@@ -103,7 +121,7 @@ const Timer = ({
     }
 
     return () => clearInterval(intervalId)
-  }, [isActive, isWorkButtonClicked, hours, minutes, seconds])
+  }, [isActive, isResetClicked, isWorkButtonClicked, hours, minutes, seconds])
 
   const handleHourClick = () => {
     setHourIsClicked(true)
@@ -120,7 +138,11 @@ const Timer = ({
   const handleHoursUpdate = (event) => {
     const newHours = event.target.value
     window.localStorage.setItem(isWorkButtonClicked ? 'Work Hours' : 'Rest Hours', newHours)
-    setHours(newHours)
+    if (minutes == 0 && seconds == 0 && newHours != 0) {
+      setHours(newHours)
+    } else if (minutes != 0 || seconds != 0) {
+      setHours(newHours)
+    }
   }
 
   const handleMinutesUpdate = (event) => {
@@ -128,7 +150,11 @@ const Timer = ({
     newMinutes = newMinutes.slice(0, 2)
     if (newMinutes >= 0 && newMinutes <= 59) {
       window.localStorage.setItem(isWorkButtonClicked ? 'Work Minutes' : 'Rest Minutes', newMinutes)
-      setMinutes(newMinutes)
+      if (hours == 0 && seconds == 0 && newMinutes != 0) {
+        setMinutes(newMinutes)
+      } else if (hours != 0 || seconds != 0) {
+        setMinutes(newMinutes)
+      }
     }
   }
 
@@ -137,7 +163,11 @@ const Timer = ({
     newSeconds = newSeconds.slice(0, 2)
     if (newSeconds >= 0 && newSeconds <= 59) {
       window.localStorage.setItem(isWorkButtonClicked ? 'Work Seconds' : 'Rest Seconds', newSeconds)
-      setSeconds(newSeconds)
+      if (hours == 0 && minutes == 0 && newSeconds != 0) {
+        setSeconds(newSeconds)
+      } else if (hours != 0 || minutes != 0) {
+        setSeconds(newSeconds)
+      }
     }
   }
 
@@ -188,7 +218,7 @@ const Timer = ({
           onClick={handleHourClick}
           className="w-24 h-16 md:w-36 md:h-24 lg:w-44 lg:h-32  text-7xl md:text-8xl lg:text-9xl"
         >
-          {hours < 10 ? '0' + hours : hours}
+          {hours < 10 && hours.length < 2 ? '0' + hours : hours}
         </h1>
       )}
       <h1 className="text-7xl md:text-8xl lg:text-9xl">:</h1>

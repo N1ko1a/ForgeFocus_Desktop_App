@@ -7,13 +7,10 @@ const PomodoraTimer = () => {
   const [isActive, setIsActive] = useState(false)
   const [isWorkButtonClicked, setIsWorkButtonClicked] = useState(true)
   const [isRestButtonClicked, setIsRestButtonClicked] = useState(false)
+  const [isResetClicked, setIsResetClicked] = useState(false)
 
   const toggleTimer = () => {
     setIsActive((prevIsActive) => !prevIsActive)
-  }
-
-  const resetTimer = () => {
-    setIsActive(false)
   }
 
   const handleWorkButton = () => {
@@ -36,6 +33,12 @@ const PomodoraTimer = () => {
     setIsWorkButtonClicked(!value)
     setIsRestButtonClicked(value)
   }
+  const handleResetClicked = () => {
+    setIsResetClicked(true)
+  }
+  const handleIsResetClicked = (value) => {
+    setIsResetClicked(value)
+  }
   return (
     <div className="flex flex-col gap-2 w-fit p-5 h-5/6 justify-center items-center bg-black/40 rounded-2xl backdrop-blur-sm ">
       {isWorkButtonClicked ? (
@@ -48,6 +51,8 @@ const PomodoraTimer = () => {
           isWorkButtonClicked={isWorkButtonClicked}
           handleIsWorkButtonClicked={handleIsWorkButtonClicked}
           handleIsRestButtonClicked={handleIsRestButtonClicked}
+          handleIsResetClicked={handleIsResetClicked}
+          isResetClicked={isResetClicked}
         />
       ) : null}
       {isRestButtonClicked ? (
@@ -60,6 +65,8 @@ const PomodoraTimer = () => {
           isWorkButtonClicked={isWorkButtonClicked}
           handleIsWorkButtonClicked={handleIsWorkButtonClicked}
           handleIsRestButtonClicked={handleIsRestButtonClicked}
+          handleIsResetClicked={handleIsResetClicked}
+          isResetClicked={isResetClicked}
         />
       ) : null}
       <div className="flex w-full h-full justify-between">
@@ -78,7 +85,7 @@ const PomodoraTimer = () => {
             {isActive ? <FaPause /> : <FaPlay />}
           </button>
           <button
-            onClick={resetTimer}
+            onClick={handleResetClicked}
             className="text-2xl md:text-3xl lg:text-4xl  hover:text-white transition duration-500 ease-in-out"
           >
             <VscDebugRestart />
