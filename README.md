@@ -2,6 +2,7 @@
 
 ForgeFocus is an Electron application that integrates React, Express, and MongoDB to offer a suite of productivity tools including a calendar, to-do list, and Pomodoro timer. This versatile application is tailored to streamline time and task management for enhanced productivity.
 
+[video.webm](https://github.com/N1ko1a/Productivity_Desktop_App/assets/85966654/17d357f4-aa84-440c-b084-5b3614f6264a)
 ## Features
 
 ### Pomodoro Timer
@@ -12,12 +13,6 @@ ForgeFocus includes a dynamic calendar feature that notifies users 30 minutes pr
 
 ### To-Do List
 The to-do list feature is enhanced with workspaces, allowing users to organize tasks efficiently. Users can create, edit, and delete tasks within specific workspaces, ensuring seamless task management.
-
-<video width="320" height="240" controls>
-  <source src="./resources/video.webm" type="video/webm">
-  Vaš preglednik ne podržava prikazivanje video zapisa.
-</video>
-
 
 ## Requirements
 
