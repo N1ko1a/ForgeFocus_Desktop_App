@@ -281,7 +281,7 @@ function ToDo(): JSX.Element {
                   className="flex justify-between p-2 w-full h-10 bg-gray/30  backdrop-blur-sm rounded-lg text-white  mt-1 mb-1  "
                   initial={{ opacity: 0, scale: 0.5 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, y: -10 }}
+                  exit={{ opacity: 0, scale: 0.5 }}
                   transition={{
                     duration: 0.4,
                     delay: 0.1,
