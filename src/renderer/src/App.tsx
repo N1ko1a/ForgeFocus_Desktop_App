@@ -10,7 +10,7 @@ function App(): JSX.Element {
     window.localStorage.setItem('Count', 0)
   })
   return (
-    <div className="bg-[url('/home/nikola/Nikola/github/Productivity_Desktop_App/src/renderer/src/assets/pxfuel.jpg')] w-screen h-screen bg-cover bg-center flex flex-col justify-center items-center">
+    <div className="bg-[url('/home/neski/Nikola/github/ForgeFocus_Desktop_App/src/renderer/src/assets/pxfuel.jpg')] w-screen h-screen bg-cover bg-center flex flex-col justify-center items-center">
       <div className="flex justify-center items-center text-white w-screen h-1/4">
         <PomodoraTimer />
       </div>

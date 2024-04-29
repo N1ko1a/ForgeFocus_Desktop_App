@@ -218,7 +218,7 @@ const Timer = ({
           onClick={handleHourClick}
           className="w-24 h-16 md:w-36 md:h-24 lg:w-44 lg:h-32  text-7xl md:text-8xl lg:text-9xl"
         >
-          {hours < 10 && hours.length < 2 ? '0' + hours : hours}
+          {hours < 10 ? '0' + hours : hours}
         </h1>
       )}
       <h1 className="text-7xl md:text-8xl lg:text-9xl">:</h1>
@@ -237,7 +237,7 @@ const Timer = ({
           onClick={handleMinutesClick}
           className="w-24 h-16 md:w-36 md:h-24 lg:w-44 lg:h-32  text-7xl md:text-8xl lg:text-9xl"
         >
-          {minutes < 10 && minutes.length < 2 ? '0' + minutes : minutes}
+          {minutes < 10 ? '0' + minutes : minutes}
         </h1>
       )}
       <h1 className="text-7xl md:text-8xl lg:text-9xl">:</h1>
@@ -256,7 +256,7 @@ const Timer = ({
           onClick={handleSecondsClick}
           className="w-24 h-16 md:w-36 md:h-24 lg:w-44 lg:h-32  text-7xl md:text-8xl lg:text-9xl"
         >
-          {seconds < 10 && seconds.length < 2 ? '0' + seconds : seconds}
+          {seconds < 10 ? '0' + seconds : seconds}
         </h1>
       )}
     </div>

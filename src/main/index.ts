@@ -60,10 +60,10 @@ app.whenReady().then(() => {
   // Pokreni server node server.js
   serverProcess = spawn(
     'node',
-    ['/home/nikola/Nikola/github/Productivity_Desktop_App/api/server.js'],
+    ['/home/neski/Nikola/github/ForgeFocus_Desktop_App/api/server.js'],
     { stdio: 'inherit' }
   )
-  app.on('activate', function () {
+  app.on('activate', function() {
     // On macOS it's common to re-create a window in the app when the
     // dock icon is clicked and there are no other windows open.
     if (BrowserWindow.getAllWindows().length === 0) createWindow()
