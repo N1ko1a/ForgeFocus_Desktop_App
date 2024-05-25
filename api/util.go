@@ -57,7 +57,7 @@ func createAccessToken(email string) (string, error) {
 		return "", err
 	}
 
-	// Print information about the created token
+	fmt.Println("New Access Token created")
 	return tokenString, nil
 }
 
@@ -74,7 +74,8 @@ func createRefreshToken(email string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	fmt.Printf("Refresh Token claims added: %+v\n", refClaims)
+
+	fmt.Println("New Refresh Token created")
 	return refreshTokenString, nil
 }
 
@@ -91,7 +92,7 @@ func verifyToken(tokenString string) (*jwt.Token, error) {
 
 func SetCookie(w http.ResponseWriter, name string, value string, expiration time.Time) {
 	cookie := buildCookie(name, value, expiration)
-	fmt.Println(cookie)
+	fmt.Println("New cookie created")
 	http.SetCookie(w, cookie)
 }
 
@@ -163,9 +164,9 @@ func authenticateMiddleware(next http.Handler) http.Handler {
 				fmt.Println("Error creating new token: ", err)
 				return
 			}
-			fmt.Println(newAccessToken)
 
 			SetCookie(w, "AccessToken", newAccessToken, time.Now().Add(time.Minute*2))
+
 			_, err = jwt.Parse(newAccessToken, func(token *jwt.Token) (interface{}, error) {
 				return secretKey, nil
 			})
@@ -200,7 +201,6 @@ func authenticateMiddleware(next http.Handler) http.Handler {
 							fmt.Println("Error creating new token: ", err)
 							return
 						}
-						fmt.Println(newAccessToken)
 						SetCookie(w, "AccessToken", newAccessToken, time.Now().Add(time.Minute*2))
 						_, err = jwt.Parse(newAccessToken, func(token *jwt.Token) (interface{}, error) {
 							return secretKey, nil

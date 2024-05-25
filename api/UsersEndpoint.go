@@ -206,21 +206,18 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	SetCookie(w, "AccessToken", tokenString, time.Now().Add(time.Minute*20))
 	SetCookie(w, "RefreshToken", refreshTokenString, time.Now().Add(time.Hour*25))
 
-	// Set the content type to JSON
-	w.Header().Set("Content-Type", "application/json")
-
-	// Encode the data to JSON format
-	responseData := map[string]interface{}{
-		"user":  existingUser,
-		"token": tokenString,
-	}
-
-	// Write the JSON data to the response writer
-	err = json.NewEncoder(w).Encode(responseData)
+	// Send a JSON response indicating success
+	response := map[string]string{"message": "User logeed in successfully"}
+	jsonResponse, err := json.Marshal(response)
 	if err != nil {
-		http.Error(w, "Error encoding JSON", http.StatusInternalServerError)
+		http.Error(w, "Error creating response", http.StatusInternalServerError)
 		return
 	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	w.Write(jsonResponse)
+
 }
 
 // LOGOUT
