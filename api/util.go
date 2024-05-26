@@ -132,7 +132,7 @@ func authenticateMiddleware(next http.Handler) http.Handler {
 		var refreshTokenString string
 		refershCoockie, err := r.Cookie("RefreshToken")
 		if err == http.ErrNoCookie {
-			fmt.Println("Refresh Coockie not present")
+			http.Error(w, "Refresh cookie not present", http.StatusUnauthorized)
 			return
 
 		} else if err != http.ErrNoCookie {
@@ -140,7 +140,7 @@ func authenticateMiddleware(next http.Handler) http.Handler {
 			refreshTokenString = refershCoockie.Value
 
 		} else {
-			fmt.Printf("Error: %v", err)
+			http.Error(w, "Error occurred: "+err.Error(), http.StatusInternalServerError)
 			return
 		}
 
@@ -149,19 +149,19 @@ func authenticateMiddleware(next http.Handler) http.Handler {
 			fmt.Println("Access Coockie not present")
 			refreshToken, err := verifyToken(refreshTokenString)
 			if err != nil {
-				fmt.Printf("Refresh token inside access coockie not present: %v", err)
+				http.Error(w, "Refresh token inside access coockie not present: "+err.Error(), http.StatusUnauthorized)
 				return
 			}
 			refershClaims, ok := refreshToken.Claims.(jwt.MapClaims)
 			if !ok {
-				fmt.Println("refresh token claims are invalide")
+				http.Error(w, "Refresh token claims are invalide", http.StatusUnauthorized)
 				return
 			}
 			email := refershClaims["sub"].(string)
 
 			newAccessToken, err := createAccessToken(email)
 			if err != nil {
-				fmt.Println("Error creating new token: ", err)
+				http.Error(w, "Error creating new token: "+err.Error(), http.StatusInternalServerError)
 				return
 			}
 
@@ -171,7 +171,7 @@ func authenticateMiddleware(next http.Handler) http.Handler {
 				return secretKey, nil
 			})
 			if err != nil {
-				fmt.Println("Error parsing new token: ", err)
+				http.Error(w, "Error parsing new token: "+err.Error(), http.StatusInternalServerError)
 				return
 			}
 			next.ServeHTTP(w, r)
@@ -183,22 +183,22 @@ func authenticateMiddleware(next http.Handler) http.Handler {
 			if err != nil {
 				if ve, ok := err.(*jwt.ValidationError); ok {
 					if ve.Errors&jwt.ValidationErrorExpired != 0 {
-						fmt.Println("Access token has expired")
+						http.Error(w, "Access token has expired", http.StatusUnauthorized)
 
 						refreshToken, err := verifyToken(refreshTokenString)
 						if err != nil {
-							fmt.Printf("Refresh token inside access coockie present: %v", err)
+							http.Error(w, "Refresh token inside access coockie present: "+err.Error(), http.StatusInternalServerError)
 							return
 						}
 						refreshClames, ok := refreshToken.Claims.(jwt.MapClaims)
 						if !ok {
-							fmt.Println("refresh token claims are invalide")
+							http.Error(w, "refresh token claims are invalide", http.StatusInternalServerError)
 							return
 						}
 						email := refreshClames["sub"].(string)
 						newAccessToken, err := createAccessToken(email)
 						if err != nil {
-							fmt.Println("Error creating new token: ", err)
+							http.Error(w, "Error creating new token: "+err.Error(), http.StatusInternalServerError)
 							return
 						}
 						SetCookie(w, "AccessToken", newAccessToken, time.Now().Add(time.Minute*2))
@@ -206,19 +206,20 @@ func authenticateMiddleware(next http.Handler) http.Handler {
 							return secretKey, nil
 						})
 						if err != nil {
-							fmt.Println("Error parsing new token: ", err)
+							http.Error(w, "Error parsing new token: "+err.Error(), http.StatusInternalServerError)
 							return
 						}
 						next.ServeHTTP(w, r)
 					}
 				} else {
-					fmt.Println("Access token not expired and access coockie is present error: ", err)
+					http.Error(w, "Access token not expired and access coockie is present error: "+err.Error(), http.StatusInternalServerError)
 					return
 				}
 			}
+
 			next.ServeHTTP(w, r)
 		} else {
-			fmt.Printf("Error: %v", err)
+			http.Error(w, "Error: "+err.Error(), http.StatusInternalServerError)
 			return
 		}
 
