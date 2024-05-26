@@ -22,25 +22,30 @@ func returnAllButtons(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	Collection, ctx, err := connectToCollection(buttonsTestCollection)
-	if err != nil {
-		http.Error(w, "Error connecting to collection", http.StatusInternalServerError)
-		return
-	}
+	authenticateMiddleware := authenticateMiddleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		Collection, ctx, err := connectToCollection(buttonsCollection)
+		if err != nil {
+			http.Error(w, "Error connecting to collection", http.StatusInternalServerError)
+			return
+		}
 
-	cursor, err := Collection.Find(ctx, bson.M{})
-	if err != nil {
-		http.Error(w, "Error finding buttons", http.StatusInternalServerError)
-		return
-	}
+		cursor, err := Collection.Find(ctx, bson.M{})
+		if err != nil {
+			http.Error(w, "Error finding buttons", http.StatusInternalServerError)
+			return
+		}
 
-	var buttons []*ButtonsSchema
-	if err = cursor.All(ctx, &buttons); err != nil {
-		http.Error(w, "Error retriving elements from cursor", http.StatusInternalServerError)
-		return
-	}
+		var buttons []*ButtonsSchema
+		if err = cursor.All(ctx, &buttons); err != nil {
+			http.Error(w, "Error retriving elements from cursor", http.StatusInternalServerError)
+			return
+		}
 
-	json.NewEncoder(w).Encode(buttons)
+		json.NewEncoder(w).Encode(buttons)
+	}))
+
+	// Izvršavanje middleware-a
+	authenticateMiddleware.ServeHTTP(w, r)
 
 }
 
@@ -52,30 +57,35 @@ func returnOneButton(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	vars := mux.Vars(r)
-	id := vars["id"]
+	authenticateMiddleware := authenticateMiddleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		vars := mux.Vars(r)
+		id := vars["id"]
 
-	objID, err := primitive.ObjectIDFromHex(id)
-	if err != nil {
-		http.Error(w, "Invalide ID format", http.StatusBadRequest)
-		return
-	}
+		objID, err := primitive.ObjectIDFromHex(id)
+		if err != nil {
+			http.Error(w, "Invalide ID format", http.StatusBadRequest)
+			return
+		}
 
-	Collection, ctx, err := connectToCollection(buttonsTestCollection)
-	if err != nil {
-		http.Error(w, "Error connecting to Collection", http.StatusInternalServerError)
-		return
-	}
+		Collection, ctx, err := connectToCollection(buttonsCollection)
+		if err != nil {
+			http.Error(w, "Error connecting to Collection", http.StatusInternalServerError)
+			return
+		}
 
-	var button *ButtonsSchema
+		var button *ButtonsSchema
 
-	err = Collection.FindOne(ctx, bson.M{"_id": objID}).Decode(&button)
-	if err != nil {
-		http.Error(w, "Error querying the database", http.StatusInternalServerError)
-		return
-	}
+		err = Collection.FindOne(ctx, bson.M{"_id": objID}).Decode(&button)
+		if err != nil {
+			http.Error(w, "Error querying the database", http.StatusInternalServerError)
+			return
+		}
 
-	json.NewEncoder(w).Encode(button)
+		json.NewEncoder(w).Encode(button)
+	}))
+
+	// Izvršavanje middleware-a
+	authenticateMiddleware.ServeHTTP(w, r)
 }
 
 // Create button
@@ -86,52 +96,57 @@ func createNewButton(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	Collection, ctx, err := connectToCollection(buttonsTestCollection)
-	if err != nil {
-		http.Error(w, "Error connecting to Collection", http.StatusInternalServerError)
-		return
-	}
+	authenticateMiddleware := authenticateMiddleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		Collection, ctx, err := connectToCollection(buttonsCollection)
+		if err != nil {
+			http.Error(w, "Error connecting to Collection", http.StatusInternalServerError)
+			return
+		}
 
-	var button *ButtonsSchema
-	reqBody, err := io.ReadAll(r.Body)
-	if err != nil {
-		http.Error(w, "Error reading request body", http.StatusInternalServerError)
-		return
-	}
+		var button *ButtonsSchema
+		reqBody, err := io.ReadAll(r.Body)
+		if err != nil {
+			http.Error(w, "Error reading request body", http.StatusInternalServerError)
+			return
+		}
 
-	err = json.Unmarshal(reqBody, &button)
-	if err != nil {
-		http.Error(w, "Error decoding request body", http.StatusInternalServerError)
-		return
-	}
+		err = json.Unmarshal(reqBody, &button)
+		if err != nil {
+			http.Error(w, "Error decoding request body", http.StatusInternalServerError)
+			return
+		}
 
-	if button.Name == "" {
-		http.Error(w, "You have to input the name of a button", http.StatusBadRequest)
-		return
-	}
+		if button.Name == "" {
+			http.Error(w, "You have to input the name of a button", http.StatusBadRequest)
+			return
+		}
 
-	existingButton := Collection.FindOne(ctx, bson.M{"name": button.Name})
-	if existingButton.Err() == nil {
-		http.Error(w, "A button with the same name already exists", http.StatusConflict)
-		return
-	}
+		existingButton := Collection.FindOne(ctx, bson.M{"name": button.Name})
+		if existingButton.Err() == nil {
+			http.Error(w, "A button with the same name already exists", http.StatusConflict)
+			return
+		}
 
-	_, err = Collection.InsertOne(ctx, button)
-	if err != nil {
-		http.Error(w, "Error inserting new todo", http.StatusInternalServerError)
-		return
-	}
+		_, err = Collection.InsertOne(ctx, button)
+		if err != nil {
+			http.Error(w, "Error inserting new todo", http.StatusInternalServerError)
+			return
+		}
 
-	response := map[string]string{"message": "Button item created successfully"}
-	jsonResponse, err := json.Marshal(response)
-	if err != nil {
-		http.Error(w, "Error creatign response", http.StatusInternalServerError)
-		return
-	}
+		response := map[string]string{"message": "Button item created successfully"}
+		jsonResponse, err := json.Marshal(response)
+		if err != nil {
+			http.Error(w, "Error creatign response", http.StatusInternalServerError)
+			return
+		}
 
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	w.Write(jsonResponse)
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		w.Write(jsonResponse)
+	}))
+
+	// Izvršavanje middleware-a
+	authenticateMiddleware.ServeHTTP(w, r)
 }
 
 // Delete one button
@@ -142,38 +157,43 @@ func deleteOneButton(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	Collection, ctx, err := connectToCollection(buttonsTestCollection)
-	if err != nil {
-		http.Error(w, "Error connecting to Collection", http.StatusInternalServerError)
-		return
-	}
+	authenticateMiddleware := authenticateMiddleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		Collection, ctx, err := connectToCollection(buttonsCollection)
+		if err != nil {
+			http.Error(w, "Error connecting to Collection", http.StatusInternalServerError)
+			return
+		}
 
-	vars := mux.Vars(r)
-	id := vars["id"]
+		vars := mux.Vars(r)
+		id := vars["id"]
 
-	objID, err := primitive.ObjectIDFromHex(id)
-	if err != nil {
-		http.Error(w, "Invalide ID format", http.StatusBadRequest)
-		return
-	}
+		objID, err := primitive.ObjectIDFromHex(id)
+		if err != nil {
+			http.Error(w, "Invalide ID format", http.StatusBadRequest)
+			return
+		}
 
-	filter := bson.M{"_id": objID}
-	_, err = Collection.DeleteOne(ctx, filter)
-	if err != nil {
-		http.Error(w, "Error deleting button", http.StatusInternalServerError)
-		return
-	}
+		filter := bson.M{"_id": objID}
+		_, err = Collection.DeleteOne(ctx, filter)
+		if err != nil {
+			http.Error(w, "Error deleting button", http.StatusInternalServerError)
+			return
+		}
 
-	response := map[string]string{"message": "Button item deleted successfully"}
-	jsonResponse, err := json.Marshal(response)
-	if err != nil {
-		http.Error(w, "Error creating response", http.StatusInternalServerError)
-		return
-	}
+		response := map[string]string{"message": "Button item deleted successfully"}
+		jsonResponse, err := json.Marshal(response)
+		if err != nil {
+			http.Error(w, "Error creating response", http.StatusInternalServerError)
+			return
+		}
 
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	w.Write(jsonResponse)
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		w.Write(jsonResponse)
+	}))
+
+	// Izvršavanje middleware-a
+	authenticateMiddleware.ServeHTTP(w, r)
 }
 
 // Update button
@@ -184,53 +204,58 @@ func updateOneButton(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	Collection, ctx, err := connectToCollection(buttonsTestCollection)
-	if err != nil {
-		http.Error(w, "Error connecting to Collection", http.StatusInternalServerError)
-		return
-	}
+	authenticateMiddleware := authenticateMiddleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		Collection, ctx, err := connectToCollection(buttonsCollection)
+		if err != nil {
+			http.Error(w, "Error connecting to Collection", http.StatusInternalServerError)
+			return
+		}
 
-	vars := mux.Vars(r)
-	id := vars["id"]
+		vars := mux.Vars(r)
+		id := vars["id"]
 
-	objID, err := primitive.ObjectIDFromHex(id)
-	if err != nil {
-		http.Error(w, "Invalide ID format", http.StatusBadRequest)
-		return
-	}
+		objID, err := primitive.ObjectIDFromHex(id)
+		if err != nil {
+			http.Error(w, "Invalide ID format", http.StatusBadRequest)
+			return
+		}
 
-	var button *ButtonsSchema
-	err = json.NewDecoder(r.Body).Decode(&button)
-	if err != nil {
-		http.Error(w, "Error decoding request body", http.StatusBadRequest)
-		return
-	}
+		var button *ButtonsSchema
+		err = json.NewDecoder(r.Body).Decode(&button)
+		if err != nil {
+			http.Error(w, "Error decoding request body", http.StatusBadRequest)
+			return
+		}
 
-	if button.Name == "" {
-		http.Error(w, "You have to input name to update the button", http.StatusBadRequest)
-		return
-	}
+		if button.Name == "" {
+			http.Error(w, "You have to input name to update the button", http.StatusBadRequest)
+			return
+		}
 
-	update := bson.M{}
-	if button.Name != "" {
-		update["$set"] = bson.M{"name": button.Name}
-	}
+		update := bson.M{}
+		if button.Name != "" {
+			update["$set"] = bson.M{"name": button.Name}
+		}
 
-	filter := bson.M{"_id": objID}
-	_, err = Collection.UpdateOne(ctx, filter, update)
-	if err != nil {
-		http.Error(w, "Error updating todo", http.StatusInternalServerError)
-		return
-	}
+		filter := bson.M{"_id": objID}
+		_, err = Collection.UpdateOne(ctx, filter, update)
+		if err != nil {
+			http.Error(w, "Error updating todo", http.StatusInternalServerError)
+			return
+		}
 
-	response := map[string]string{"message": "Button item updated successfully"}
-	jsonResponse, err := json.Marshal(response)
-	if err != nil {
-		http.Error(w, "Error creating response", http.StatusInternalServerError)
-		return
-	}
+		response := map[string]string{"message": "Button item updated successfully"}
+		jsonResponse, err := json.Marshal(response)
+		if err != nil {
+			http.Error(w, "Error creating response", http.StatusInternalServerError)
+			return
+		}
 
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	w.Write(jsonResponse)
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		w.Write(jsonResponse)
+	}))
+
+	// Izvršavanje middleware-a
+	authenticateMiddleware.ServeHTTP(w, r)
 }

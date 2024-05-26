@@ -35,6 +35,23 @@ func TestCreateNewEvent(t *testing.T) {
 
 		rr := httptest.NewRecorder()
 
+		email := "johndoe@example.com"
+		expiration := time.Now().Add(time.Hour)
+		accessToken, err := createAccessToken(email)
+		if err != nil {
+			t.Errorf("Error creating access token: %v", err)
+		}
+		refreshToken, err := createRefreshToken(email)
+		if err != nil {
+			t.Errorf("Error creating refresh token: %v", err)
+		}
+		SetCookie(rr, "AccessToken", accessToken, expiration)
+		SetCookie(rr, "RefreshToken", refreshToken, expiration)
+		// Retrieve the cookies from the recorder and set them on the request
+		cookies := rr.Result().Cookies()
+		for _, cookie := range cookies {
+			req.AddCookie(cookie)
+		}
 		createNewEvent(rr, req)
 
 		if status := rr.Code; status != http.StatusConflict {
@@ -72,6 +89,23 @@ func TestCreateNewEvent(t *testing.T) {
 
 		rr := httptest.NewRecorder()
 
+		email := "johndoe@example.com"
+		expiration := time.Now().Add(time.Hour)
+		accessToken, err := createAccessToken(email)
+		if err != nil {
+			t.Errorf("Error creating access token: %v", err)
+		}
+		refreshToken, err := createRefreshToken(email)
+		if err != nil {
+			t.Errorf("Error creating refresh token: %v", err)
+		}
+		SetCookie(rr, "AccessToken", accessToken, expiration)
+		SetCookie(rr, "RefreshToken", refreshToken, expiration)
+		// Retrieve the cookies from the recorder and set them on the request
+		cookies := rr.Result().Cookies()
+		for _, cookie := range cookies {
+			req.AddCookie(cookie)
+		}
 		createNewEvent(rr, req)
 
 		if status := rr.Code; status != http.StatusBadRequest {
@@ -108,6 +142,23 @@ func TestCreateNewEvent(t *testing.T) {
 
 		rr := httptest.NewRecorder()
 
+		email := "johndoe@example.com"
+		expiration := time.Now().Add(time.Hour)
+		accessToken, err := createAccessToken(email)
+		if err != nil {
+			t.Errorf("Error creating access token: %v", err)
+		}
+		refreshToken, err := createRefreshToken(email)
+		if err != nil {
+			t.Errorf("Error creating refresh token: %v", err)
+		}
+		SetCookie(rr, "AccessToken", accessToken, expiration)
+		SetCookie(rr, "RefreshToken", refreshToken, expiration)
+		// Retrieve the cookies from the recorder and set them on the request
+		cookies := rr.Result().Cookies()
+		for _, cookie := range cookies {
+			req.AddCookie(cookie)
+		}
 		createNewEvent(rr, req)
 
 		if status := rr.Code; status != http.StatusOK {
@@ -150,6 +201,23 @@ func TestReturningAllEvents(t *testing.T) {
 
 	rr := httptest.NewRecorder()
 
+	email := "johndoe@example.com"
+	expiration := time.Now().Add(time.Hour)
+	accessToken, err := createAccessToken(email)
+	if err != nil {
+		t.Errorf("Error creating access token: %v", err)
+	}
+	refreshToken, err := createRefreshToken(email)
+	if err != nil {
+		t.Errorf("Error creating refresh token: %v", err)
+	}
+	SetCookie(rr, "AccessToken", accessToken, expiration)
+	SetCookie(rr, "RefreshToken", refreshToken, expiration)
+	// Retrieve the cookies from the recorder and set them on the request
+	cookies := rr.Result().Cookies()
+	for _, cookie := range cookies {
+		req.AddCookie(cookie)
+	}
 	returnAllEvents(rr, req)
 
 	if status := rr.Code; status != http.StatusOK {
@@ -196,6 +264,23 @@ func TestReturnOneEvent(t *testing.T) {
 
 	rr := httptest.NewRecorder()
 
+	email := "johndoe@example.com"
+	expiration := time.Now().Add(time.Hour)
+	accessToken, err := createAccessToken(email)
+	if err != nil {
+		t.Errorf("Error creating access token: %v", err)
+	}
+	refreshToken, err := createRefreshToken(email)
+	if err != nil {
+		t.Errorf("Error creating refresh token: %v", err)
+	}
+	SetCookie(rr, "AccessToken", accessToken, expiration)
+	SetCookie(rr, "RefreshToken", refreshToken, expiration)
+	// Retrieve the cookies from the recorder and set them on the request
+	cookies := rr.Result().Cookies()
+	for _, cookie := range cookies {
+		req.AddCookie(cookie)
+	}
 	// Invoke the handler
 	returnOneEvent(rr, req)
 
@@ -233,6 +318,23 @@ func TestDeleteOneEvent(t *testing.T) {
 	req = mux.SetURLVars(req, map[string]string{"id": id})
 	rr := httptest.NewRecorder()
 
+	email := "johndoe@example.com"
+	expiration := time.Now().Add(time.Hour)
+	accessToken, err := createAccessToken(email)
+	if err != nil {
+		t.Errorf("Error creating access token: %v", err)
+	}
+	refreshToken, err := createRefreshToken(email)
+	if err != nil {
+		t.Errorf("Error creating refresh token: %v", err)
+	}
+	SetCookie(rr, "AccessToken", accessToken, expiration)
+	SetCookie(rr, "RefreshToken", refreshToken, expiration)
+	// Retrieve the cookies from the recorder and set them on the request
+	cookies := rr.Result().Cookies()
+	for _, cookie := range cookies {
+		req.AddCookie(cookie)
+	}
 	// Invoke the handler
 	deleteOneEvent(rr, req)
 
@@ -285,6 +387,23 @@ func TestUpdateOneEvent(t *testing.T) {
 		// Create a recorder to record the response
 		rr := httptest.NewRecorder()
 
+		email := "johndoe@example.com"
+		expiration := time.Now().Add(time.Hour)
+		accessToken, err := createAccessToken(email)
+		if err != nil {
+			t.Errorf("Error creating access token: %v", err)
+		}
+		refreshToken, err := createRefreshToken(email)
+		if err != nil {
+			t.Errorf("Error creating refresh token: %v", err)
+		}
+		SetCookie(rr, "AccessToken", accessToken, expiration)
+		SetCookie(rr, "RefreshToken", refreshToken, expiration)
+		// Retrieve the cookies from the recorder and set them on the request
+		cookies := rr.Result().Cookies()
+		for _, cookie := range cookies {
+			req.AddCookie(cookie)
+		}
 		// Invoke the handler
 		updateOneEvent(rr, req)
 
@@ -330,6 +449,23 @@ func TestUpdateOneEvent(t *testing.T) {
 		req = mux.SetURLVars(req, map[string]string{"id": id})
 		rr := httptest.NewRecorder()
 
+		email := "johndoe@example.com"
+		expiration := time.Now().Add(time.Hour)
+		accessToken, err := createAccessToken(email)
+		if err != nil {
+			t.Errorf("Error creating access token: %v", err)
+		}
+		refreshToken, err := createRefreshToken(email)
+		if err != nil {
+			t.Errorf("Error creating refresh token: %v", err)
+		}
+		SetCookie(rr, "AccessToken", accessToken, expiration)
+		SetCookie(rr, "RefreshToken", refreshToken, expiration)
+		// Retrieve the cookies from the recorder and set them on the request
+		cookies := rr.Result().Cookies()
+		for _, cookie := range cookies {
+			req.AddCookie(cookie)
+		}
 		// Invoke the handler
 		updateOneEvent(rr, req)
 
