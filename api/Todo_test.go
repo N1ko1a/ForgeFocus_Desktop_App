@@ -7,6 +7,7 @@ import (
 	"net/http/httptest"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/gorilla/mux"
 )
@@ -103,23 +104,40 @@ func TestReturningAllTodos(t *testing.T) {
 	examples := []*TodoSchema{
 		{
 			Content:   "Test Todo",
-			Workspace: "Test Workspace",
+			Workspace: " UpdateWorksapce",
 			Completed: false,
 		},
 		{
-			Content:   "Test Todo1",
-			Workspace: "Test Workspace",
+			Content:   "UpdateTodo",
+			Workspace: "UpdateWorkspace",
 			Completed: false,
 		},
 	}
 
 	// Setup
-	req, err := http.NewRequest("GET", "/todos", nil)
+	req, err := http.NewRequest("GET", "/todo", nil)
 	if err != nil {
 		t.Fatal(err)
 	}
 	rr := httptest.NewRecorder()
 
+	email := "johndoe@example.com"
+	expiration := time.Now().Add(time.Hour)
+	accessToken, err := createAccessToken(email)
+	if err != nil {
+		t.Errorf("Error creating access token: %v", err)
+	}
+	refreshToken, err := createRefreshToken(email)
+	if err != nil {
+		t.Errorf("Error creating refresh token: %v", err)
+	}
+	SetCookie(rr, "AccessToken", accessToken, expiration)
+	SetCookie(rr, "RefreshToken", refreshToken, expiration)
+	// Retrieve the cookies from the recorder and set them on the request
+	cookies := rr.Result().Cookies()
+	for _, cookie := range cookies {
+		req.AddCookie(cookie)
+	}
 	// Invoke the handler
 	returnAllTodos(rr, req)
 

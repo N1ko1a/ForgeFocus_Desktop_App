@@ -24,7 +24,7 @@ func returnAllTodos(w http.ResponseWriter, r *http.Request) {
 
 	// Provjera autentičnosti korištenjem middleware-a
 	authenticateMiddleware := authenticateMiddleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		Collection, ctx, err := connectToCollection(todoCollection)
+		Collection, ctx, err := connectToCollection(todoTestCollection)
 		if err != nil {
 			http.Error(w, "Error connecting to collection", http.StatusInternalServerError)
 			return
