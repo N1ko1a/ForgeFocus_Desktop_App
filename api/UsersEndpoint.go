@@ -155,7 +155,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	Collection, ctx, err := connectToCollection(userCollection)
+	Collection, ctx, err := connectToCollection(userTestCollection)
 	if err != nil {
 		http.Error(w, "Error connecting to Collection", http.StatusInternalServerError)
 		return
@@ -223,6 +223,6 @@ func Login(w http.ResponseWriter, r *http.Request) {
 
 // LOGOUT
 func Logout(w http.ResponseWriter, r *http.Request) {
-	ClearCookie(w, "jwt")
-	http.Redirect(w, r, "/login", http.StatusSeeOther)
+	ClearCookie(w, "AccessToken")
+	ClearCookie(w, "RefreshToken")
 }
