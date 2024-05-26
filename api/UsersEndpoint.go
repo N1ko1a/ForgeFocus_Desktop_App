@@ -13,6 +13,7 @@ import (
 )
 
 var userCollection string = "users"
+var userTestCollection string = "usersTest"
 
 type User struct {
 	FirstName      string
@@ -31,7 +32,7 @@ func Register(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusMethodNotAllowed)
 		return
 	}
-	Collection, ctx, err := connectToCollection(userCollection)
+	Collection, ctx, err := connectToCollection(userTestCollection)
 	if err != nil {
 		http.Error(w, "Error connecting to Collection", http.StatusInternalServerError)
 		return
@@ -102,7 +103,7 @@ func Register(w http.ResponseWriter, r *http.Request) {
 	// Comparing the hashed password with the input password
 	err = bcrypt.CompareHashAndPassword(hashedPassword, []byte(user.PasswordConf))
 	if err != nil {
-		http.Error(w, "Passwords do not mach ", http.StatusInternalServerError)
+		http.Error(w, "Passwords do not mach", http.StatusBadRequest)
 		return
 	}
 	var addUser = bson.M{
